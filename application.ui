@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Application</class>
+ <widget class="QMainWindow" name="Application">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Application</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuParam_tre">
+    <property name="title">
+     <string>Fichier</string>
+    </property>
+    <addaction name="actionExporter"/>
+    <addaction name="actionExporter_vers"/>
+    <addaction name="actionImporter"/>
+    <addaction name="actionReinitialiser_les_donn_es"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuitter_2"/>
+   </widget>
+   <widget class="QMenu" name="menuFen_tre">
+    <property name="title">
+     <string>Fenêtre</string>
+    </property>
+    <addaction name="actionAccueil"/>
+    <addaction name="actionInscription"/>
+    <addaction name="actionStatistique"/>
+    <addaction name="actionGestion_des_participants"/>
+   </widget>
+   <widget class="QMenu" name="menuEdition">
+    <property name="title">
+     <string>Edition</string>
+    </property>
+    <addaction name="actionR_seau"/>
+    <addaction name="actionParam_tre"/>
+   </widget>
+   <addaction name="menuParam_tre"/>
+   <addaction name="menuFen_tre"/>
+   <addaction name="menuEdition"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actiontest">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
+  <action name="actionExporter">
+   <property name="text">
+    <string>Exporter</string>
+   </property>
+  </action>
+  <action name="actionImporter">
+   <property name="text">
+    <string>Importer</string>
+   </property>
+  </action>
+  <action name="actionExporter_vers">
+   <property name="text">
+    <string>Exporter vers</string>
+   </property>
+  </action>
+  <action name="actionReinitialiser_les_donn_es">
+   <property name="text">
+    <string>Reinitialiser les données</string>
+   </property>
+  </action>
+  <action name="actionConfiguration">
+   <property name="text">
+    <string>Configuration</string>
+   </property>
+  </action>
+  <action name="actionAccueil">
+   <property name="text">
+    <string>Accueil</string>
+   </property>
+  </action>
+  <action name="actionInscription">
+   <property name="text">
+    <string>Inscription</string>
+   </property>
+  </action>
+  <action name="actionStatistique">
+   <property name="text">
+    <string>Statistique</string>
+   </property>
+  </action>
+  <action name="actionGestion_des_participants">
+   <property name="text">
+    <string>Gestion des participants</string>
+   </property>
+  </action>
+  <action name="actionQuitter">
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+  </action>
+  <action name="actionQuitter_2">
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+  </action>
+  <action name="actionParam_tre">
+   <property name="text">
+    <string>Paramètres</string>
+   </property>
+  </action>
+  <action name="actionR_seau">
+   <property name="text">
+    <string>Base de données</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
