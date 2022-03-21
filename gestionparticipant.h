@@ -15,10 +15,13 @@ class GestionParticipant : public QMainWindow
 public:
      GestionParticipant();
     ~GestionParticipant();
+    void createTableView();
     void init();
 
 private slots:
     void on_suprButton_clicked();
+
+    void on_updateButton_clicked();
 
 private:
     Ui::GestionParticipant ui;

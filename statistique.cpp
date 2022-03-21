@@ -6,8 +6,6 @@
 Statistique::Statistique()
 {
     ui.setupUi(this);
-    //Statistique initialisation du model
-    this->Init();
 }
 
 

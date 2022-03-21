@@ -12,9 +12,9 @@ class InscriptionForm : public QMainWindow
 public:
     InscriptionForm();
     ~InscriptionForm();
-    bool isParticipantExist(const QString &mail);
     void Register();
     int getSexe();
+    void clearAllInputs();
 
 private slots:
     void on_inscriptionButton_clicked();

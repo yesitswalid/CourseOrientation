@@ -44,12 +44,14 @@ void Application::on_actionInscription_triggered()
 
 void Application::on_actionGestion_des_participants_triggered()
 {
+     this->gestion_participant->createTableView();
      this->gestion_participant->show();
 }
 
 
 void Application::on_actionStatistique_triggered()
 {
+    this->statistique->Init();
     this->statistique->show();
 }
 

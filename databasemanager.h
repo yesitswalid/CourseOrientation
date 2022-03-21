@@ -10,7 +10,7 @@
 ///////////////////////////// CREER UNE TABLE //////////////////////////////////////////////////
 
 const auto PARTICIPANTS_SQL = QString(R"(
-    create table if not exists participants(id integer primary key, lastname varchar, firstname varchar, mail varchar, password varchar, date_birthday varchar,
+    create table if not exists participants(id integer primary key, lastname varchar, firstname varchar, mail varchar, password varchar, year varchar,
                        genre_id integer)
     )");
 
@@ -21,7 +21,7 @@ const auto GENRES_SQL = QString(R"(
 
 //////////////////// REQUETE INSERTION /////////////////
 const auto INSERT_PARTICIPANT_SQL = QString(R"(
-    insert into participants(lastname, firstname, mail, password, date_birthday, genre_id)
+    insert into participants(lastname, firstname, mail, password, year, genre_id)
                       values(?, ?, ?, ?, ?, ?)
     )");
 
@@ -64,9 +64,10 @@ class DatabaseManager
 {
 public:
     DatabaseManager();
-    void addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &date_birthday, int genreId);
+    void addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId);
     void insertGenreIfNotExist(const QString &sexe);
     void removeParticipant(const int id);
+    bool isParticipantExist(const QString &mail);
     QSqlError initDb();
 
 };

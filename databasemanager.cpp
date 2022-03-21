@@ -28,15 +28,28 @@ QSqlError DatabaseManager::initDb()
     insertGenreIfNotExist(QString("feminin"));
     insertGenreIfNotExist(QString("Non binaire"));
 
-    this->addParticipant(QString("Khazri"), QString("Walid"), QString("test1@gmail.com"), QString::fromLocal8Bit(QCryptographicHash::hash("mdp123", QCryptographicHash::Sha256)), QDate::currentDate().toString("dd/MM/yyyy"), 1);
-    //addParticipant(q, QString("Khazri2"), QString("Walid2"), QString("test133@gmail.com"), QString::fromLocal8Bit(QCryptographicHash::hash("mdp12399", QCryptographicHash::Sha256)), QDate::currentDate().toString("dd/MM/yyyy"), 1);
-
 
     return QSqlError();
 }
 
+bool DatabaseManager::isParticipantExist(const QString &mail)
+{
+     QSqlQuery q;
+     q.prepare(SELECT_DATA_PARTICIPANT);
+     q.addBindValue(mail);
+     if(q.exec())
+     {
+        return q.next();
+     }
+     int recCount = 0;
+     while(q.next())
+     {
+      recCount++;
+     }
+     return  (recCount > 0);
+}
 
-void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &date_birthday, int genreId)
+void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId)
 {
     QSqlQuery q;
     q.prepare(INSERT_PARTICIPANT_SQL);
@@ -44,7 +57,7 @@ void DatabaseManager::addParticipant(const QString &lastname, const QString &fir
     q.addBindValue(firstname);
     q.addBindValue(mail);
     q.addBindValue(password);
-    q.addBindValue(date_birthday);
+    q.addBindValue(year);
     q.addBindValue(genreId);
     q.exec();
 }
