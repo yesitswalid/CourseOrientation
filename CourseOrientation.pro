@@ -14,23 +14,26 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    SQLiteConverter.cpp \
     databasemanager.cpp \
+    gestioncourse.cpp \
     gestionparticipant.cpp \
     inscriptionform.cpp \
     main.cpp \
     application.cpp \
+    sqliteconverter.cpp \
     statistique.cpp
 
 HEADERS += \
     application.h \
     databasemanager.h \
+    gestioncourse.h \
     gestionparticipant.h \
     inscriptionform.h \
     statistique.h
 
 FORMS += \
     application.ui \
+    gestioncourse.ui \
     gestionparticipant.ui \
     inscriptionform.ui \
     statistique.ui

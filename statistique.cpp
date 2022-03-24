@@ -12,7 +12,11 @@ Statistique::Statistique()
 void Statistique::Init()
 {
     QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery(QSqlQuery("select * from participants"));
+    model->setQuery(QSqlQuery("SELECT participants.id AS participantId, "
+                              "participants.genre_id AS genreId, "
+                              "participants.firstname AS nom_participant "
+                              "FROM participants "
+                              ""));
     ui.statistiqueView->setModel(model);
 }
 

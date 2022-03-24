@@ -3,7 +3,7 @@
 #include <gestionparticipant.h>
 #include <inscriptionform.h>
 #include <statistique.h>
-
+#include <sqliteconverter.cpp>
 
 Application::Application(QWidget *parent)
     : QMainWindow(parent)
@@ -11,7 +11,12 @@ Application::Application(QWidget *parent)
 {
     ui->setupUi(this);
 
+
+    SQLiteConverter *sqlite = new SQLiteConverter("course.db");
+    qDebug() << sqlite->SqlDataToMap();
+
     //Gestion du participant
+
     this->gestion_participant = new GestionParticipant();
     this->gestion_participant->init();
 

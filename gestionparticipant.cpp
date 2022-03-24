@@ -44,14 +44,15 @@ void GestionParticipant::createTableView()
     model->setTable("participants");
 
     genreIdx = model->fieldIndex("genre_id");
-    model->setRelation(genreIdx, QSqlRelation("genres", "id", "sexe"));
+    model->setRelation(genreIdx, QSqlRelation("genders", "id", "sexe"));
 
     model->setHeaderData(model->fieldIndex("lastname"), Qt::Horizontal, tr("Nom"));
     model->setHeaderData(model->fieldIndex("firstname"), Qt::Horizontal, tr("Prénom"));
     model->setHeaderData(model->fieldIndex("mail"), Qt::Horizontal, tr("Mail"));
     model->setHeaderData(model->fieldIndex("password"), Qt::Horizontal, tr("Mot de Passe"));
-    model->setHeaderData(model->fieldIndex("date_birthday"), Qt::Horizontal, tr("Date de Naissance"));
+    model->setHeaderData(model->fieldIndex("year"), Qt::Horizontal, tr("Date de Naissance"));
     model->setHeaderData(genreIdx, Qt::Horizontal, tr("Genre"));
+    model->setHeaderData(model->fieldIndex("rfid"), Qt::Horizontal, tr("RFID"));
 
     if (!model->select()) {
         showError(model->lastError());
@@ -73,7 +74,8 @@ void GestionParticipant::createTableView()
     mapper->addMapping(ui.prenomEdit, model->fieldIndex("firstname"));
     mapper->addMapping(ui.mailEdit, model->fieldIndex("mail"));
     mapper->addMapping(ui.genreEdit, genreIdx);
-    mapper->addMapping(ui.dateEdit, model->fieldIndex("date_birthday"));
+    mapper->addMapping(ui.dateEdit, model->fieldIndex("year"));
+    mapper->addMapping(ui.rfidEdit, model->fieldIndex("rfid"));
 
 
     connect(ui.participantTable->selectionModel(),
@@ -131,7 +133,7 @@ void GestionParticipant::on_updateButton_clicked()
 {
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
     QSqlQuery q;
-    q.prepare("UPDATE participants SET lastname=:lastname, firstname=:firstname, mail=:mail, password=:password, year=:year, genre_id=:genre_id WHERE id=:id");
+    q.prepare("UPDATE participants SET lastname=:lastname, firstname=:firstname, mail=:mail, password=:password, year=:year, genre_id=:genre_id, rfid=:rfid WHERE id=:id");
     q.bindValue(":id", selectedIndexes[0].data().value<int>());
     q.bindValue(":lastname", selectedIndexes[1].data().value<QString>());
     q.bindValue(":firstname", selectedIndexes[2].data().value<QString>());
@@ -150,6 +152,8 @@ void GestionParticipant::on_updateButton_clicked()
     } else {
         q.bindValue(":genre_id", 3);
     }
+
+    q.bindValue(":rfid", selectedIndexes[7].data().value<int>());
     /*
     for(auto i = selectedIndexes.constBegin() + 1;i!=selectedIndexes.constEnd();++i){
         q.addBindValue(i->data().toString());
@@ -161,5 +165,6 @@ void GestionParticipant::on_updateButton_clicked()
     */
     qDebug() << q.exec();
     this->createTableView();
+
 }
 

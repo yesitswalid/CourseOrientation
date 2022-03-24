@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Books</string>
+   <string>Gestion du Participant</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout">
@@ -148,6 +148,21 @@
            <widget class="QPushButton" name="suprButton">
             <property name="text">
              <string>Supprimer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="rfidEdit"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>RFID</string>
             </property>
            </widget>
           </item>

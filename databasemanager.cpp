@@ -21,7 +21,13 @@ QSqlError DatabaseManager::initDb()
     QSqlQuery q;
     if (!q.exec(PARTICIPANTS_SQL))
         return q.lastError();
-    if (!q.exec(GENRES_SQL))
+    if (!q.exec(GENDERS_SQL))
+        return q.lastError();
+    if (!q.exec(RACES_SQL))
+        return q.lastError();
+    if (!q.exec(CHECKPOINTS_SQL))
+        return q.lastError();
+    if (!q.exec(ARRIVALS_SQL))
         return q.lastError();
 
     insertGenreIfNotExist(QString("masculin"));
@@ -70,7 +76,7 @@ void DatabaseManager::insertGenreIfNotExist(const QString &sexe)
     if(q.exec()){
         if(!q.next())
         {
-           q.prepare(INSERT_GENRE_SQL);
+           q.prepare(INSERT_GENDER_SQL);
            q.addBindValue(sexe);
            q.exec();
         }
