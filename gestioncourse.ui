@@ -1,19 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>GestionCourse</class>
- <widget class="QWidget" name="GestionCourse">
+ <widget class="QMainWindow" name="GestionCourse">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>863</width>
-    <height>511</height>
+    <width>866</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Gestion du Participant</string>
   </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout">
+    <property name="spacing">
+     <number>6</number>
+    </property>
+    <property name="leftMargin">
+     <number>9</number>
+    </property>
+    <property name="topMargin">
+     <number>9</number>
+    </property>
+    <property name="rightMargin">
+     <number>9</number>
+    </property>
+    <property name="bottomMargin">
+     <number>9</number>
+    </property>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string/>
+      </property>
+      <layout class="QVBoxLayout">
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
+        <number>9</number>
+       </property>
+       <item>
+        <widget class="QTableView" name="courseTable">
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="continueButton">
+         <property name="text">
+          <string>Continuer</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
+ <tabstops>
+  <tabstop>courseTable</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

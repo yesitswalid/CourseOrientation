@@ -1,7 +1,6 @@
 #ifndef DATABASEMANAGER_H
 #define DATABASEMANAGER_H
 
-
 #include <QtSql>
 #include <QDate>
 #include <QString>

@@ -1,9 +1,11 @@
 #include "databasemanager.h"
+#include <QMessageBox>
 
 
 DatabaseManager::DatabaseManager()
 {
 }
+
 
 QSqlError DatabaseManager::initDb()
 {

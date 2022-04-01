@@ -1,22 +1,35 @@
 #ifndef GESTIONCOURSE_H
 #define GESTIONCOURSE_H
 
-#include <QWidget>
+#include <QSqlError>
+#include <QMainWindow>
+#include <QtSql>
+#include <QtWidgets>
+#include <ui_gestioncourse.h>
+#include "databasemanager.h"
 
-namespace Ui {
-class GestionCourse;
-}
-
-class GestionCourse : public QWidget
+class GestionCourse : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit GestionCourse(QWidget *parent = nullptr);
+     GestionCourse();
     ~GestionCourse();
+    void createTableView();
+    void init();
+
+private slots:
+
+    void on_continueButton_clicked();
 
 private:
-    Ui::GestionCourse *ui;
+    Ui::GestionCourse ui;
+    void showError(const QSqlError &err);
+    QSqlRelationalTableModel *model;
+    DatabaseManager *m_db;
+    int genreIdx;
+    void createMenuBar();
 };
 
-#endif // GESTIONCOURSE_H
+
+#endif // GESTIONPARTICIPANT_H

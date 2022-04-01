@@ -60,7 +60,7 @@ void InscriptionForm::clearAllInputs()
 {
     ui.nomEdit->clear();
     ui.prenomEdit->clear();
-    ui.dateEdit->clear();
+    ui.dateEdit->setDateTime(QDateTime::fromString("DD/MM/YY"));
     ui.mailEdit->clear();
     ui.mdpEdit->clear();
 

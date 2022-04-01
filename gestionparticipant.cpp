@@ -1,6 +1,5 @@
 #include "gestionparticipant.h"
 #include "ui_gestionparticipant.h"
-//#include "database_manager.h"
 #include "databasemanager.h"
 #include <QtSql>
 #include <QMessageBox>
@@ -17,6 +16,7 @@ GestionParticipant::GestionParticipant()
 
 void GestionParticipant::init()
 {
+    /*
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
         QMessageBox::critical(
                     this,
@@ -30,6 +30,7 @@ void GestionParticipant::init()
         showError(err);
         return;
     }
+    */
 
     this->createTableView();
     createMenuBar();
