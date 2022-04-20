@@ -2,7 +2,7 @@
 
 #requires(qtConfig(tableview))
 
-QT += core gui sql widgets widgets
+QT += core gui sql widgets widgets network
 requires(qtConfig(tableview))
 
 #greaterThan(QT_MAJOR_VERSION, 4): QT += core gui widgets sql
@@ -14,6 +14,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    configform.cpp \
     databasemanager.cpp \
     gestioncourse.cpp \
     gestionparticipant.cpp \
@@ -25,14 +26,18 @@ SOURCES += \
 
 HEADERS += \
     application.h \
+    configform.h \
+    configuration.h \
     databasemanager.h \
     gestioncourse.h \
     gestionparticipant.h \
     inscriptionform.h \
+    server.h \
     statistique.h
 
 FORMS += \
     application.ui \
+    configform.ui \
     gestioncourse.ui \
     gestionparticipant.ui \
     inscriptionform.ui \

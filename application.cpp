@@ -4,10 +4,13 @@
 #include <inscriptionform.h>
 #include <statistique.h>
 #include <sqliteconverter.cpp>
+#include <configuration.h>
+#include <QFileInfo>
 
 void Application::init()
 {
-    //Iniatilisation des données
+
+    //Initialisation des données
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
         QMessageBox::critical(
                     this,
@@ -24,6 +27,12 @@ void Application::init()
         return;
     }
 
+    //Initialisation de la config
+    //Configuration::init();
+    //QString contents = Configuration::readAll();
+
+    //qDebug() << Configuration::get("base_de_donnes");
+
    // SQLiteConverter *sqlite = new SQLiteConverter("course.db");
     //qDebug() << sqlite->SqlDataToMap();
 
@@ -38,7 +47,6 @@ void Application::init()
     this->inscription_form = new InscriptionForm();
 
     //Statistique
-
 
     this->statistique = new Statistique();
 }
@@ -55,7 +63,12 @@ Application::Application(QWidget *parent)
 
 Application::~Application()
 {
+    //Nettoyer la memoire après la fermuture de programme
     delete ui;
+    delete gestion_participant;
+    delete inscription_form;
+    delete statistique;
+    delete m_db;
 }
 
 

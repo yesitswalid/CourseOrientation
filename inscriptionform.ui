@@ -16,87 +16,115 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Inscription</string>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="gridLayoutWidget">
+  <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>20</y>
-     <width>291</width>
-     <height>535</height>
+     <x>30</x>
+     <y>70</y>
+     <width>824</width>
+     <height>441</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="6" column="2">
+   <property name="title">
+    <string>Inscription</string>
+   </property>
+   <layout class="QFormLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="nomLabel">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Nom:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="nomEdit"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="prenomLabel">
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Prénom:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="prenomEdit"/>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Date de naissance</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QDateEdit" name="dateEdit"/>
+    </item>
+    <item row="9" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Sexe</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
      <widget class="QComboBox" name="comboBox"/>
     </item>
-    <item row="18" column="0">
+    <item row="13" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Addresse mail</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="1">
+     <widget class="QLineEdit" name="mailEdit"/>
+    </item>
+    <item row="16" column="1">
+     <widget class="QLineEdit" name="mdpEdit"/>
+    </item>
+    <item row="17" column="1">
      <widget class="QPushButton" name="inscriptionButton">
       <property name="text">
        <string>Inscription</string>
       </property>
      </widget>
     </item>
-    <item row="15" column="0">
-     <widget class="QLineEdit" name="mdpEdit"/>
-    </item>
-    <item row="12" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Addresse mail</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>Date de naissance</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0">
-     <widget class="QDateEdit" name="dateEdit"/>
-    </item>
-    <item row="14" column="0">
+    <item row="16" column="0">
      <widget class="QLabel" name="label_4">
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
       <property name="text">
        <string>Mot de Passe</string>
       </property>
      </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLineEdit" name="prenomEdit"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Nom</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Prénom</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1" colspan="2">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>Sexe</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLineEdit" name="nomEdit"/>
-    </item>
-    <item row="13" column="0">
-     <widget class="QLineEdit" name="mailEdit"/>
     </item>
    </layout>
   </widget>

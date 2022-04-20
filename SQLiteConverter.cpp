@@ -45,11 +45,16 @@ QSqlDatabase *getDatabase()
 QMap<QString, QString> SqlDataToMap()
 {
 
-
+    for (int i = 0; i < (int)sizeof(m_db->tables()); i++)
+    {
+        qDebug() << m_db->tables().at(i).toUtf8();
+    }
+    /*
     for (QString table : m_db->tables())
     {
         qDebug() << table;
     }
+    */
 
     QMap<QString, QString>parsed;
     parsed["test"] = "d";

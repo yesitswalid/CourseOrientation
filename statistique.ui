@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Statistique</string>
   </property>
   <widget class="QLineEdit" name="rechercheEdit">
    <property name="geometry">
@@ -63,14 +63,13 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>20</y>
+     <y>10</y>
      <width>321</width>
      <height>61</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <family>Bahnschrift SemiBold</family>
      <pointsize>36</pointsize>
      <bold>true</bold>
     </font>

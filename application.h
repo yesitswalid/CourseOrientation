@@ -7,6 +7,7 @@
 #include <inscriptionform.h>
 #include <statistique.h>
 #include <databasemanager.h>
+#include <configuration.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Application; }
@@ -23,6 +24,7 @@ public:
     InscriptionForm *inscription_form;
     Statistique *statistique;
     DatabaseManager *m_db;
+    Configuration *configuration;
 
 private slots:
     void on_actionConfiguration_triggered();
@@ -37,6 +39,5 @@ private:
     Ui::Application *ui;
     void init();
     void showError(const QSqlError &err);
-
 };
 #endif // APPLICATION_H
