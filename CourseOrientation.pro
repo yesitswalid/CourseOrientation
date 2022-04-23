@@ -15,19 +15,20 @@ CONFIG += c++11
 
 SOURCES += \
     configform.cpp \
+    configuration.cpp \
     databasemanager.cpp \
     gestioncourse.cpp \
     gestionparticipant.cpp \
     inscriptionform.cpp \
     main.cpp \
     application.cpp \
+    mysqlconverter.cpp \
     sqliteconverter.cpp \
     statistique.cpp
 
 HEADERS += \
     application.h \
     configform.h \
-    configuration.h \
     databasemanager.h \
     gestioncourse.h \
     gestionparticipant.h \

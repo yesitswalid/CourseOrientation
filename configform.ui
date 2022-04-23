@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Base de données</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -42,31 +42,76 @@
      <number>9</number>
     </property>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>IP:</string>
-      </property>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>IP:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>User:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="ipEdit"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Mot de passe: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Port:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="userEdit"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Base de données</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QLineEdit" name="mdpEdit"/>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLineEdit" name="dbEdit"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="portEdit"/>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QLineEdit" name="ipEdit"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Port:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="portEdit"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="continueButton">
-      <property name="text">
-       <string>confirmer</string>
-      </property>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="continueButton">
+        <property name="text">
+         <string>Sauvegarder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="testButton">
+        <property name="text">
+         <string>Test connection</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

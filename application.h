@@ -3,11 +3,12 @@
 
 #include <QMainWindow>
 #include <QSqlError>
+#include <configuration.cpp>
 #include <gestionparticipant.h>
 #include <inscriptionform.h>
 #include <statistique.h>
 #include <databasemanager.h>
-#include <configuration.h>
+#include <configform.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Application; }
@@ -23,6 +24,7 @@ public:
     GestionParticipant *gestion_participant;
     InscriptionForm *inscription_form;
     Statistique *statistique;
+    ConfigForm *config_form;
     DatabaseManager *m_db;
     Configuration *configuration;
 
@@ -34,6 +36,8 @@ private slots:
     void on_actionGestion_des_participants_triggered();
 
     void on_actionStatistique_triggered();
+
+    void on_actionBddConfig_triggered();
 
 private:
     Ui::Application *ui;

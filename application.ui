@@ -47,7 +47,7 @@
     <property name="title">
      <string>Edition</string>
     </property>
-    <addaction name="actionR_seau"/>
+    <addaction name="actionBddConfig"/>
     <addaction name="actionParam_tre"/>
    </widget>
    <addaction name="menuParam_tre"/>
@@ -120,7 +120,7 @@
     <string>Paramètres</string>
    </property>
   </action>
-  <action name="actionR_seau">
+  <action name="actionBddConfig">
    <property name="text">
     <string>Base de données</string>
    </property>

@@ -4,7 +4,7 @@
 #include <inscriptionform.h>
 #include <statistique.h>
 #include <sqliteconverter.cpp>
-#include <configuration.h>
+#include <mysqlconverter.cpp>
 #include <QFileInfo>
 
 void Application::init()
@@ -28,14 +28,21 @@ void Application::init()
     }
 
     //Initialisation de la config
-    //Configuration::init();
-    //QString contents = Configuration::readAll();
+    configuration = new Configuration();
+
+    //qDebug() << configuration->get("mangue");
+
 
     //qDebug() << Configuration::get("base_de_donnes");
 
    // SQLiteConverter *sqlite = new SQLiteConverter("course.db");
     //qDebug() << sqlite->SqlDataToMap();
 
+    //QString hostname, QString dbName, QString username, QString password
+
+    //ToDo : A changer mettre les valeur de la configuration check si les valeurs existe dans le fichier pour pouvoir les affecter
+    MySQLConverter *m_mydb = new MySQLConverter("root", "walid13", "127.0.0.1", "coursorient");
+    qDebug() << m_mydb->SqlDataToMap();
 
     //Gestion du participant
 
@@ -46,9 +53,13 @@ void Application::init()
 
     this->inscription_form = new InscriptionForm();
 
+    //Config Base de données
+    this->config_form = new ConfigForm();
+
     //Statistique
 
     this->statistique = new Statistique();
+
 }
 
 Application::Application(QWidget *parent)
@@ -103,5 +114,11 @@ void Application::on_actionStatistique_triggered()
 {
     this->statistique->Init();
     this->statistique->show();
+}
+
+
+void Application::on_actionBddConfig_triggered()
+{
+    this->config_form->show();
 }
 

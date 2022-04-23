@@ -3,6 +3,8 @@
 
 #include <ui_configform.h>
 #include <QWidget>
+#include <configuration.cpp>
+#include <QSqlDatabase>
 
 class ConfigForm : public QWidget
 {
@@ -12,8 +14,15 @@ public:
     explicit ConfigForm();
     ~ConfigForm();
 
+private slots:
+    void on_continueButton_clicked();
+
+    void on_testButton_clicked();
+
 private:
     Ui::ConfigForm ui;
+    QSqlDatabase *m_db;
+    Configuration *configuration;
 };
 
 #endif // CONFIGFORM_H
