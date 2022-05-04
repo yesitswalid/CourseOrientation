@@ -79,13 +79,15 @@ QSqlDatabase *getDatabase()
     return this->m_db;
 }
 
-void exportSql(QString name)
+void exportSql(QString filePath)
 {
     QProcess dumpProcess;
     QStringList args;
-    args << "-uroot" << "-pmysql" << "test";
-    dumpProcess.setStandardOutputFile(name + " .sql");
+    //args << "-uroot" << "-pmysql" << "test";
+    args << "-uroot" << "-pmysql" << filePath;
+    dumpProcess.setStandardOutputFile(filePath);
     dumpProcess.start("mysqldump", args); //mysqldump requis !!!!!! dans l'environnement
+    dumpProcess.waitForFinished(); //Attendre que le processus soit entirement finit.
 }
 
 QMap<QString, QString> SqlDataToMap()

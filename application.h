@@ -9,6 +9,7 @@
 #include <statistique.h>
 #include <databasemanager.h>
 #include <configform.h>
+#include <sqliteconverter.cpp>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Application; }
@@ -27,6 +28,7 @@ public:
     ConfigForm *config_form;
     DatabaseManager *m_db;
     Configuration *configuration;
+    SQLiteConverter *m_sqlite;
 
 private slots:
     void on_actionConfiguration_triggered();
@@ -38,6 +40,8 @@ private slots:
     void on_actionStatistique_triggered();
 
     void on_actionBddConfig_triggered();
+
+    void on_actionExporter_vers_triggered();
 
 private:
     Ui::Application *ui;

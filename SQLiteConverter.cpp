@@ -1,3 +1,6 @@
+#ifndef SQLITECONVERTER_CPP
+#define SQLITECONVERTER_CPP
+
 #include <QMap>
 #include <QString>
 #include <QDebug>
@@ -8,20 +11,22 @@ class SQLiteConverter {
 
 public:
     QSqlDatabase *m_db;
+    QString path;
 
 
 
 SQLiteConverter()
 {
     m_db = new QSqlDatabase();
-    m_db->addDatabase("QSQLITE");
+    m_db->addDatabase("QSQLITE", "mySqlite");
 }
 
-SQLiteConverter(QString path)
+SQLiteConverter(QString p)
 {
     m_db = new QSqlDatabase();
-    m_db->addDatabase("QSQLITE");
-    m_db->setDatabaseName(path);
+    m_db->addDatabase("QSQLITE", "mySqlite");
+    m_db->setDatabaseName(p);
+    this->path = QDir::currentPath() + "/" + p;
 
     if (!m_db->open())
     {
@@ -34,6 +39,79 @@ SQLiteConverter(QString path)
 ~SQLiteConverter()
 {
     //Destructeur
+    delete m_db;
+}
+
+
+
+bool exportDbTableSchemaToFile(
+       const QString &t_createTableStatementSeperator /* = QString("--;;")  */
+    )
+    {
+       QString t_fileName;
+       t_fileName = m_db->databaseName();
+       bool r_dumpingSuccessfull = false;
+
+       if( m_db->open())
+       {
+          qDebug() << "Dump de la base de données et du schema de "+ t_fileName;
+
+          QFile outputFile(t_fileName);
+          outputFile.open(QIODevice::WriteOnly);
+
+          if( !outputFile.isOpen() )
+          {
+             qDebug() << "- Erreur lors de l'ouverture du fichier '" << t_fileName << "' pour pouvoir dump SQL pour les tables de creation!";
+             return r_dumpingSuccessfull;
+          }
+
+
+          QTextStream outStream(&outputFile);
+
+          QSqlQuery sqlite_masterQuery;
+          sqlite_masterQuery = m_db->exec();
+
+          if(!sqlite_masterQuery.exec("SELECT * FROM sqlite_master"))
+          {
+             QString lastError = sqlite_masterQuery.lastError().text();
+             qDebug() << lastError;
+             return r_dumpingSuccessfull;
+          }
+          else
+          {
+             do
+             {
+                QString tableName = sqlite_masterQuery.value("name").toString();
+                if( sqlite_masterQuery.value("type").toString() == "table" && tableName != "sqlite_sequence" )
+                {
+                   outStream << sqlite_masterQuery.value("sql").toString();
+                   outStream << "\n";
+                   outStream << t_createTableStatementSeperator;
+                   outStream << "\n";
+
+                   r_dumpingSuccessfull = true;
+                }
+             } while( sqlite_masterQuery.next() );
+          }
+
+          outputFile.close();
+       }
+
+       return r_dumpingSuccessfull;
+}
+
+void exportSql(QString filePath)
+{
+
+    QProcess dumpProcess;
+    QStringList args;
+    QString cmd;
+
+    cmd = "sqlite3 " + QString('"') + path + QString('"') + " .dump > " + filePath;
+    args << path + " .dump > " + filePath;
+    dumpProcess.setStandardOutputFile(filePath); //avertir la sortie d'un fichier pour permettre la creation du fichier
+    dumpProcess.startCommand(cmd); //sqlite3 requis !!!!!! dans l'environnement (Executer la commande suivante dans un nouveau processus sur un invite de command ou terminal)
+    dumpProcess.waitForFinished(); //Attendre que le processus soit entirement finit.
 }
 
 
@@ -61,5 +139,17 @@ QMap<QString, QString> SqlDataToMap()
     return parsed; 
 }
 
+void setPath(QString path)
+{
+    this->path = path;
+}
+
+QString getPath()
+{
+    return this->path;
+}
+
 
 };
+
+#endif

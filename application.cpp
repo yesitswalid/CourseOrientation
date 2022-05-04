@@ -35,7 +35,7 @@ void Application::init()
 
     //qDebug() << Configuration::get("base_de_donnes");
 
-   // SQLiteConverter *sqlite = new SQLiteConverter("course.db");
+    m_sqlite = new SQLiteConverter("course.db");
     //qDebug() << sqlite->SqlDataToMap();
 
     //QString hostname, QString dbName, QString username, QString password
@@ -120,5 +120,18 @@ void Application::on_actionStatistique_triggered()
 void Application::on_actionBddConfig_triggered()
 {
     this->config_form->show();
+}
+
+
+void Application::on_actionExporter_vers_triggered()
+{
+    QString s = QFileDialog::getSaveFileName(this,
+                    "Exporter vers (*.sql)",
+                    "",
+                    "sql (*.sql)");
+
+    m_sqlite->exportSql(s);
+
+
 }
 
