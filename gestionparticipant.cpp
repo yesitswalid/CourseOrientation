@@ -16,22 +16,6 @@ GestionParticipant::GestionParticipant()
 
 void GestionParticipant::init()
 {
-    /*
-    if (!QSqlDatabase::drivers().contains("QSQLITE"))
-        QMessageBox::critical(
-                    this,
-                    "Impossible de charger la base de données sqlite",
-                    "Le pilote SQLite n'a pas été trouver"
-                    );
-
-    // Initialisation base de données
-    QSqlError err = m_db->initDb();
-    if (err.type() != QSqlError::NoError) {
-        showError(err);
-        return;
-    }
-    */
-
     this->createTableView();
     createMenuBar();
 }
@@ -47,6 +31,7 @@ void GestionParticipant::createTableView()
     genreIdx = model->fieldIndex("genre_id");
     model->setRelation(genreIdx, QSqlRelation("genders", "id", "sexe"));
 
+    //Specifier les colonnes des particpant necessaire pour l'organisateur pour la modification.
     model->setHeaderData(model->fieldIndex("lastname"), Qt::Horizontal, tr("Nom"));
     model->setHeaderData(model->fieldIndex("firstname"), Qt::Horizontal, tr("Prénom"));
     model->setHeaderData(model->fieldIndex("mail"), Qt::Horizontal, tr("Mail"));
@@ -55,22 +40,34 @@ void GestionParticipant::createTableView()
     model->setHeaderData(genreIdx, Qt::Horizontal, tr("Genre"));
     model->setHeaderData(model->fieldIndex("rfid"), Qt::Horizontal, tr("RFID"));
 
+    //en cas d'erreur si la colonne de la table participant n'existe pas cela retournera un MessageBox d'erreur sql detailler
     if (!model->select()) {
         showError(model->lastError());
         return;
     }
 
+    //Appliquer le model de la vue du tableau
     ui.participantTable->setModel(model);
+    //Appliquer
     ui.participantTable->setItemDelegate(new QSqlRelationalDelegate(ui.participantTable));
+    //Cacher la colonne id dans le model du tableau
     ui.participantTable->setColumnHidden(model->fieldIndex("id"), true);
+    //Activer la selection du model pour permettre la selection des items
     ui.participantTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    //la relation de la table participants avec le genre_id determine grace a l'id le sexe du participant.
+    //et s'appliquera sur le model et ainsi que sur la colonne du Genre du participant
     ui.genreEdit->setModel(model->relationModel(genreIdx));
     ui.genreEdit->setModelColumn(model->relationModel(genreIdx)->fieldIndex("sexe"));
 
+
+    //La classe QDataWidgetMapper fournit un mappage entre une section d'un modèle de données et des widgets.
     QDataWidgetMapper *mapper = new QDataWidgetMapper(this);
+    //Appliquer le model QSqlRelationTableModel
     mapper->setModel(ui.participantTable->model());
+
     mapper->setItemDelegate(new QSqlRelationalDelegate(this));
+    //Element necessaire du mappage pour l'édition du model de vue fournis à l'organisateur
     mapper->addMapping(ui.nomEdit, model->fieldIndex("lastname"));
     mapper->addMapping(ui.prenomEdit, model->fieldIndex("firstname"));
     mapper->addMapping(ui.mailEdit, model->fieldIndex("mail"));
@@ -78,13 +75,14 @@ void GestionParticipant::createTableView()
     mapper->addMapping(ui.dateEdit, model->fieldIndex("year"));
     mapper->addMapping(ui.rfidEdit, model->fieldIndex("rfid"));
 
-
+    //Appliquer un signal lorsqu'une valeur à été changer dans le model du tableau
     connect(ui.participantTable->selectionModel(),
             &QItemSelectionModel::currentRowChanged,
             mapper,
             &QDataWidgetMapper::setCurrentModelIndex
             );
 
+    //definir la selection de l'index par default de la ligne et de la colonne donc ligne 0 et colonne 0
     ui.participantTable->setCurrentIndex(model->index(0, 0));
 }
 
@@ -107,26 +105,11 @@ GestionParticipant::~GestionParticipant()
 
 void GestionParticipant::on_suprButton_clicked()
 {
-    //ui.participantTable->currentIndex().column()
-    //ui.participantTable->model()->
-    //qDebug() << ui.participantTable->model()->removeRow(ui.participantTable->currentIndex().row());
+    //Recuperer toutes les valeurs situes dans le tableau et récuperer seulement la ligne selectionner pour pouvoir récuperer les valeur de cette ligne.
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
-    qDebug() << selectedIndexes[0].data();
-    m_db->removeParticipant(selectedIndexes[0].data().value<int>());
-    this->createTableView();
-
-
-    /*
-    for(auto i = selectedIndexes.constBegin();i!=selectedIndexes.constEnd();++i){
-        qDebug() << i->data();
-
-    }
-
-    */
-
-    //qDebug() << ui.participantTable->selectionModel()->selectedRows(ui.participantTable->currentIndex().column())[0].row();
-
-            //ui.participantTable->model()->removeRows(ui.participantTable->currentIndex().row(), 1);
+    qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
+    m_db->removeParticipant(selectedIndexes[0].data().value<int>());  //Enlever le participant grace à l'id
+    this->createTableView(); //Creation du tableau et raffraichissement du model
 }
 
 
@@ -134,7 +117,10 @@ void GestionParticipant::on_updateButton_clicked()
 {
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
     QSqlQuery q;
+
+    //Préparer la requete pour mettre à jour les information du participant
     q.prepare("UPDATE participants SET lastname=:lastname, firstname=:firstname, mail=:mail, password=:password, year=:year, genre_id=:genre_id, rfid=:rfid WHERE id=:id");
+    //récupérer toutes les valeur du model du tableau de chaque colonne
     q.bindValue(":id", selectedIndexes[0].data().value<int>());
     q.bindValue(":lastname", selectedIndexes[1].data().value<QString>());
     q.bindValue(":firstname", selectedIndexes[2].data().value<QString>());
@@ -155,17 +141,8 @@ void GestionParticipant::on_updateButton_clicked()
     }
 
     q.bindValue(":rfid", selectedIndexes[7].data().value<int>());
-    /*
-    for(auto i = selectedIndexes.constBegin() + 1;i!=selectedIndexes.constEnd();++i){
-        q.addBindValue(i->data().toString());
-        qDebug() << i->data().toString();
-    }
-    qDebug() << selectedIndexes[0].data().value<int>();
-    q.addBindValue(selectedIndexes[0].data().value<int>());
-    qDebug() << q.exec();
-    */
-    qDebug() << q.exec();
-    this->createTableView();
+    qDebug() << q.exec(); //verification True = la requete a bien été mis à jour ou false erreur du sql
+    this->createTableView(); //recréer le model du tableau pour rafraichir les mise à jour éffectuer des participants
 
 }
 

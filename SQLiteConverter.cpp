@@ -102,7 +102,7 @@ bool exportDbTableSchemaToFile(
 
 void exportSql(QString filePath)
 {
-
+    /*
     QProcess dumpProcess;
     QStringList args;
     QString cmd;
@@ -112,6 +112,7 @@ void exportSql(QString filePath)
     dumpProcess.setStandardOutputFile(filePath); //avertir la sortie d'un fichier pour permettre la creation du fichier
     dumpProcess.startCommand(cmd); //sqlite3 requis !!!!!! dans l'environnement (Executer la commande suivante dans un nouveau processus sur un invite de command ou terminal)
     dumpProcess.waitForFinished(); //Attendre que le processus soit entirement finit.
+    */
 }
 
 

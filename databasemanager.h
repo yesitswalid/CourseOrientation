@@ -19,7 +19,7 @@ const auto GENDERS_SQL = QString(R"(
 
 
 const auto RACES_SQL = QString(R"(
-    create table if not exists races(id integer primary key, name varchar, datetime vachar, description varchar)
+    create table if not exists races(id integer primary key, id_department integer, name varchar, location varchar, date datetime, description varchar)
     )");
 
 const auto CHECKPOINTS_SQL = QString(R"(
@@ -41,6 +41,11 @@ const auto INSERT_PARTICIPANT_SQL = QString(R"(
 
 const auto INSERT_GENDER_SQL = QString(R"(
     INSERT OR REPLACE INTO genders (sexe) values(?);
+)");
+
+
+const auto INSERT_RACE_SQL = QString(R"(
+    INSERT INTO races(id_department, name, location, date, description) values(?, ?, ?, ?, ?)
 )");
 
 
@@ -71,17 +76,29 @@ const auto SELECT_GENRE_SEXE = QString(R"(SELECT * FROM genders WHERE sexe=?)");
 
 const auto SELECT_DATA_PARTICIPANT = QString(R"(SELECT * FROM participants WHERE mail=?)");
 
+const auto SELECT_DATA_RACE = QString(R"(SELECT * FROM races WHERE name=?)");
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class DatabaseManager
 {
+private:
+    QFileInfo *fileInfo;
+    QSqlDatabase m_db;
 public:
+    ~DatabaseManager();
     DatabaseManager();
+    DatabaseManager(QString filePath);
     void addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId);
+    void addRace(int id_department, const QString name, const QString location, const QString date, const QString description);
     void insertGenreIfNotExist(const QString &sexe);
     void removeParticipant(const int id);
     bool isParticipantExist(const QString &mail);
+    bool isRaceExist(const QString &raceName);
+    void setDb(QSqlDatabase m_db);
+    QSqlDatabase getDb();
     QSqlError initDb();
+    QSqlError initDb(QString &connectionName);
 
 };
 

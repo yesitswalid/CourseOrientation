@@ -10,6 +10,7 @@
 #include <databasemanager.h>
 #include <configform.h>
 #include <sqliteconverter.cpp>
+#include <mysqlconverter.cpp>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Application; }
@@ -27,6 +28,7 @@ public:
     Statistique *statistique;
     ConfigForm *config_form;
     DatabaseManager *m_db;
+    MySQLConverter *m_mydb;
     Configuration *configuration;
     SQLiteConverter *m_sqlite;
 
@@ -42,6 +44,8 @@ private slots:
     void on_actionBddConfig_triggered();
 
     void on_actionExporter_vers_triggered();
+
+    void on_actionImporter_triggered();
 
 private:
     Ui::Application *ui;

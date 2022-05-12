@@ -3,6 +3,10 @@
 #include <QMessageBox>
 #include <QtSql>
 
+
+#define PORT_DEFAULT 3306
+
+
 ConfigForm::ConfigForm()
 {
    ui.setupUi(this);
@@ -19,11 +23,10 @@ ConfigForm::ConfigForm()
    //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
    QJsonObject m_obj_values = m_values.toObject();
 
-
    //config json par defaut
    QJsonObject m_obj_default;
    m_obj_default["ip"] = "127.0.0.1";
-   m_obj_default["port"] = 3306;
+   m_obj_default["port"] = PORT_DEFAULT;
    m_obj_default["user"] = "root";
    m_obj_default["mot_de_passe"] = "";
    m_obj_default["database"] = "";

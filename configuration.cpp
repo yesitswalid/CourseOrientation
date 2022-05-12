@@ -15,25 +15,14 @@ class Configuration
 
 private:
     QString filename;
-public:
     QJsonObject m_parsed;
+public:
     ~Configuration()
     {
 
     }
     Configuration()
     {
-        init();
-    }
-    //Création du fichier json avec le nom spécific dans le dossier Configuration
-    Configuration(QString fn)
-    {
-        init(fn);
-    }
-    //Initialisation et création des report
-    void init()
-    {
-
         //Initialisation de la config
         QString path("Configuration/");
         QDir dir;
@@ -59,14 +48,12 @@ public:
               qWarning() << "Erreur lors du parsement : " << parseError.offset << ":" << parseError.errorString();
           } else {
               qDebug() << "La configuration " + filename + " à bien été parser";
-              //ts << doc.toJson(QJsonDocument::Compact);
               m_parsed = doc.object();
           }
     }
-
-    void init(QString fn)
+    //Création du fichier preciser l'extension .json exemple new Configuration("bdd.json") avec le nom spécific dans le dossier Configuration
+    Configuration(QString fn)
     {
-
         //Initialisation de la config
         QString path("Configuration/");
         QDir dir;

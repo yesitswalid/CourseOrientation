@@ -42,6 +42,15 @@ public slots:
         qDebug() << "Client port: " << senderPort;
         qDebug() << "Buffer: " << buffer;
 
+
+        if(buffer.contains("PORTIQUE_INIT"))
+        {
+            //clientPortique = sender, senderPort
+        }else if(buffer.contains("PORTIQUE_SEND"))
+        {
+            //Récupération de la données
+        }
+
        //char *mess = "Salut venant du serveur";
         socket->writeDatagram(QByteArray("Salut venant du serveur"), sender, senderPort);
 

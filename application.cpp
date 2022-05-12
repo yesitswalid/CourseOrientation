@@ -30,19 +30,15 @@ void Application::init()
     //Initialisation de la config
     configuration = new Configuration();
 
-    //qDebug() << configuration->get("mangue");
-
-
-    //qDebug() << Configuration::get("base_de_donnes");
-
+    //Initialisation de la classe qui permettra d'exporter, convertir les requetes et de recuperer les informations.
     m_sqlite = new SQLiteConverter("course.db");
-    //qDebug() << sqlite->SqlDataToMap();
 
     //QString hostname, QString dbName, QString username, QString password
 
     //ToDo : A changer mettre les valeur de la configuration check si les valeurs existe dans le fichier pour pouvoir les affecter
-    MySQLConverter *m_mydb = new MySQLConverter("root", "walid13", "127.0.0.1", "coursorient");
-    qDebug() << m_mydb->SqlDataToMap();
+    m_mydb = new MySQLConverter("root", "walid13", "127.0.0.1", "coursorient");
+
+    //qDebug() << m_mydb->SqlDataToMap();
 
     //Gestion du participant
 
@@ -79,7 +75,11 @@ Application::~Application()
     delete gestion_participant;
     delete inscription_form;
     delete statistique;
+    delete config_form;
+    delete configuration;
     delete m_db;
+    delete m_sqlite;
+    delete m_mydb;
 }
 
 
@@ -135,3 +135,14 @@ void Application::on_actionExporter_vers_triggered()
 
 }
 
+
+void Application::on_actionImporter_triggered()
+{
+    QString s = QFileDialog::getExistingDirectory(this,
+                    "Importer vers le dossier");
+    if(m_mydb->importData(s)){
+        QMessageBox::information(this, "Importation", "Importation avec succès les courses ont été sauvegarder dans le repertoire: " + s);
+    } else {
+        QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
+    }
+}
