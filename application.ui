@@ -13,7 +13,37 @@
   <property name="windowTitle">
    <string>Application</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QSplitter" name="splitter">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>240</y>
+      <width>551</width>
+      <height>84</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Selectionner une course :</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox"/>
+    <widget class="QPushButton" name="buttonSelectRace">
+     <property name="text">
+      <string>Valider</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>

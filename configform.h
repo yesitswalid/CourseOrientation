@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <configuration.cpp>
 #include <QSqlDatabase>
+#include <QJsonObject>
 
 class ConfigForm : public QWidget
 {
@@ -13,10 +14,10 @@ class ConfigForm : public QWidget
 public:
     explicit ConfigForm();
     ~ConfigForm();
+    QJsonObject getDatabaseData();
 
 private slots:
     void on_continueButton_clicked();
-
     void on_testButton_clicked();
 
 private:

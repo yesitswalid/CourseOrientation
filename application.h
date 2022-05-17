@@ -10,7 +10,8 @@
 #include <databasemanager.h>
 #include <configform.h>
 #include <sqliteconverter.cpp>
-#include <mysqlconverter.cpp>
+#include <mysqldata.cpp>
+#include <racemanager.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Application; }
@@ -28,9 +29,10 @@ public:
     Statistique *statistique;
     ConfigForm *config_form;
     DatabaseManager *m_db;
-    MySQLConverter *m_mydb;
+    MySQLData *m_mydb;
     Configuration *configuration;
     SQLiteConverter *m_sqlite;
+    RaceManager *getRace();
 
 private slots:
     void on_actionConfiguration_triggered();
@@ -47,9 +49,14 @@ private slots:
 
     void on_actionImporter_triggered();
 
+
+    void on_buttonSelectRace_clicked();
+
 private:
     Ui::Application *ui;
+    RaceManager *race;
     void init();
+    void initRaces();
     void showError(const QSqlError &err);
 };
 #endif // APPLICATION_H

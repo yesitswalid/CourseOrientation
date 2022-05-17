@@ -157,3 +157,15 @@ void ConfigForm::on_testButton_clicked()
     }
 }
 
+QJsonObject ConfigForm::getDatabaseData()
+{
+    //récuperation du contenus de la configuration
+    QJsonObject obj = this->configuration->getAll();
+    //chercher la clé et avoir les sous clées
+    QJsonValueRef m_values = obj.find("base_de_donnees").value();
+    //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+    QJsonObject m_obj_values = m_values.toObject();
+
+    return m_obj_values;
+}
+

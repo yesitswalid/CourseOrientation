@@ -2,6 +2,7 @@
 #include "ui_statistique.h"
 #include <QSqlQueryModel>
 #include <QSqlQuery>
+#include <racemanager.h>
 
 Statistique::Statistique()
 {
@@ -9,14 +10,15 @@ Statistique::Statistique()
 }
 
 
-void Statistique::Init()
+void Statistique::init()
 {
     QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery(QSqlQuery("SELECT participants.id AS participantId, "
-                              "participants.genre_id AS genreId, "
-                              "participants.firstname AS nom_participant "
-                              "FROM participants "
-                              ""));
+    int race_id = RaceManager::getInstance()->getRaceId();
+    model->setQuery(QSqlQuery("SELECT participants.lastname AS Nom,"
+                              "participants.firstname AS Prenom,"
+                              "races.name as Course"
+                              "FROM participants, participant_races, races, checkpoints WHERE participant_races.id=" + race_id));
+
     ui.statistiqueView->setModel(model);
 }
 

@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
 
     //Initialisation du serveur pour la communication du portique
     Server *server = new Server();
+
+    /*
     QThread *t = new QThread();
     t->setObjectName("Server");
     server->moveToThread(t);
@@ -21,6 +23,7 @@ int main(int argc, char *argv[])
 
     qDebug() << "Test: " << t->thread()->currentThread();
     qDebug() << "thread Principal:" << QThread::currentThread() << " :" << __LINE__ ;
+    */
 
 
     return a.exec();

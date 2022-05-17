@@ -22,7 +22,8 @@ SOURCES += \
     inscriptionform.cpp \
     main.cpp \
     application.cpp \
-    mysqlconverter.cpp \
+    mysqldata.cpp \
+    racemanager.cpp \
     sqliteconverter.cpp \
     statistique.cpp
 
@@ -33,6 +34,7 @@ HEADERS += \
     gestioncourse.h \
     gestionparticipant.h \
     inscriptionform.h \
+    racemanager.h \
     server.h \
     statistique.h
 

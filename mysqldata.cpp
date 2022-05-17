@@ -1,5 +1,5 @@
-#ifndef MYSQLCONVERTER_CPP
-#define MYSQLCONVERTER_CPP
+#ifndef MYSQLDATA_CPP
+#define MYSQLDATA_CPP
 
 #include <QMap>
 #include <QString>
@@ -10,14 +10,14 @@
 #include <QMessageBox>
 #include <databasemanager.h>
 
-class MySQLConverter {
+class MySQLData {
 
 
 public:
     QSqlDatabase *m_db;   
     QJsonObject *m_data;
 
-MySQLConverter()
+MySQLData()
 {    
 
     QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myMysql");
@@ -36,7 +36,7 @@ MySQLConverter()
     qDebug() << m_db->open();
 }
 
-MySQLConverter(QString username, QString password, QString hostname, QString dbName)
+MySQLData(QString username, QString password, QString hostname, QString dbName)
 {
     QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myMysql");
 
@@ -69,7 +69,7 @@ MySQLConverter(QString username, QString password, QString hostname, QString dbN
     //Constructeur
 }
 
-~MySQLConverter()
+~MySQLData()
 {
     //Destructeur
     delete m_db;
@@ -119,33 +119,35 @@ const auto ARRIVALS_SQL = QString(R"(
 
 */
 
-bool importData(QString dirPath)
+bool importData()
 {
-    QDir dir;
-    QFileInfo fileInfo;
+    //QDir dir;
+    //QFileInfo fileInfo;
     QString connectionName;
     QSqlQuery query;
-
-    QVector<int>race_ids;
-
 
     query = m_db->exec();
 
     connectionName = "myNewDb";
-    dir.setPath(dirPath);
+    //dir.setPath(dirPath);
+
+
+    /*
     query.prepare(QString("SELECT * FROM races"));
 
     if (!query.exec()) {
         return false;
     }
+    */
 
+    /*
     while (query.next())
     {
        race_ids.push_back(query.value(0).toInt());
-    }
+    }*/
 
-    for(int race_id : race_ids)
-    {
+    //for(int race_id : race_ids)
+    //{
        query.prepare(QString("SELECT email, password, firstname, lastname, year, gender FROM participants"));
 
        if (!query.exec())
@@ -153,6 +155,7 @@ bool importData(QString dirPath)
            return false;
        }
 
+       /*
        fileInfo.setFile(dir.path() + "/course_" + QString::number(race_id) + ".db");
        qDebug() << fileInfo.path();
        if(!fileInfo.exists())
@@ -162,7 +165,10 @@ bool importData(QString dirPath)
 
              if (err.type() != QSqlError::NoError) {
                  return false;
-             }
+             }*/
+
+             DatabaseManager m_db_saver = DatabaseManager();
+             QSqlError err = m_db_saver.initDb(connectionName);
 
              while(query.next())
              {
@@ -175,11 +181,11 @@ bool importData(QString dirPath)
 
                      if(!m_db_saver.isParticipantExist(email))
                      {
-                         m_db_saver.addParticipant(lastname, firstname, email, password, year, genderId);
+                         m_db_saver.addParticipant(lastname, firstname, email, password, year, genderId); //Ajouter un participant
                      }
             }
 
-             query.prepare(QString("SELECT id_department, name, date, location FROM races"));
+             query.prepare(QString("SELECT id, id_department, name, date, location FROM races"));
 
              if (!query.exec())
              {
@@ -188,25 +194,51 @@ bool importData(QString dirPath)
 
              while(query.next())
              {
-                 int id_department = query.value(0).toInt();
-                 QString raceName = query.value(1).toString();
-                 QString date = query.value(2).toString();
-                 QString location = query.value(3).toString();
+                 int race_id = query.value(0).toInt();
+                 int id_department = query.value(1).toInt();
+                 QString raceName = query.value(2).toString();
+                 QString date = query.value(3).toString();
+                 QString location = query.value(4).toString();
 
-                 qDebug() << id_department << raceName << date << location;
+                 qDebug() << race_id << id_department << raceName << date << location;
+
+                 //Application
 
                  if(!m_db_saver.isRaceExist(raceName))
                  {
-                     m_db_saver.addRace(id_department, raceName, location, date, "N/A");
+                     m_db_saver.addRace(race_id, id_department, raceName, location, date, "N/A");   //Ajouter une course
+                 }
+             }
+
+
+             query.prepare(QString("SELECT p_race.participant_id, p_race.race_id FROM participants as p, participants_races as p_race WHERE p_race.participant_id=p.id"));
+
+             if (!query.exec())
+             {
+                 return false;
+             }
+
+             while(query.next())
+             {
+                 int participant_id = query.value(0).toInt();
+                 int race_id = query.value(1).toInt();
+
+
+                 qDebug() << participant_id << race_id;
+
+                 //Application
+
+                 if(!m_db_saver.isParticipantRaceExist(participant_id))
+                 {
+                     m_db_saver.addParticipantRace(participant_id, race_id);  //Ajouter les participants sur chaque course
                  }
              }
 
              //ToDo : finish
             m_db_saver.getDb().removeDatabase(connectionName);
             m_db_saver.getDb().close();
-        }
-    }
-    return true;
+
+            return true;
 }
 
 

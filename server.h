@@ -42,17 +42,21 @@ public slots:
         qDebug() << "Client port: " << senderPort;
         qDebug() << "Buffer: " << buffer;
 
-
-        if(buffer.contains("PORTIQUE_INIT"))
+        //Pour supprimer l'ancienne données et recuperer l'id
+        if(buffer.contains("INIT"))
         {
+
+            socket->writeDatagram(QByteArray("R"), sender, senderPort);
             //clientPortique = sender, senderPort
-        }else if(buffer.contains("PORTIQUE_SEND"))
-        {
-            //Récupération de la données
-        }
 
+            //PORTIQUE_DATA (Recupere les données de balises)
+        }else if(buffer.contains("test"))
+        {
+            //récuperer les données du participant course
+            //Récupération de la données
+                        socket->writeDatagram(QByteArray("Numero serie: J388B"), sender, senderPort);
+        }
        //char *mess = "Salut venant du serveur";
-        socket->writeDatagram(QByteArray("Salut venant du serveur"), sender, senderPort);
 
     }
 };

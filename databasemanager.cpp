@@ -65,23 +65,6 @@ QSqlError DatabaseManager::initDb()
     return QSqlError();
 }
 
-bool DatabaseManager::isParticipantExist(const QString &mail)
-{
-     QSqlQuery q;
-     q = m_db.exec();
-     q.prepare(SELECT_DATA_PARTICIPANT);
-     q.addBindValue(mail);
-     if(q.exec())
-     {
-        return q.next();
-     }
-     int recCount = 0;
-     while(q.next())
-     {
-      recCount++;
-     }
-     return  (recCount > 0);
-}
 
 QSqlError DatabaseManager::initDb(QString &connectionName)
 {
@@ -119,6 +102,42 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
     return QSqlError();
 }
 
+bool DatabaseManager::isParticipantExist(const QString &mail)
+{
+     QSqlQuery q;
+     q = m_db.exec();
+     q.prepare(SELECT_DATA_PARTICIPANT);
+     q.addBindValue(mail);
+     if(q.exec())
+     {
+        return q.next();
+     }
+     int recCount = 0;
+     while(q.next())
+     {
+      recCount++;
+     }
+     return  (recCount > 0);
+}
+
+
+bool DatabaseManager::isParticipantRaceExist(int participantId)
+{
+     QSqlQuery q;
+     q = m_db.exec();
+     q.prepare(SELECT_DATA_EXIST_PARTICIPANT_RACE);
+     q.addBindValue(participantId);
+     if(q.exec())
+     {
+        return q.next();
+     }
+     int recCount = 0;
+     while(q.next())
+     {
+      recCount++;
+     }
+     return  (recCount > 0);
+}
 
 void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId)
 {
@@ -132,6 +151,17 @@ void DatabaseManager::addParticipant(const QString &lastname, const QString &fir
     q.addBindValue(year);
     q.addBindValue(genreId);
     q.exec();
+}
+
+void DatabaseManager::addParticipantRace(int participantId, int raceId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare(INSERT_PARTICIPANT_RACE_SQL);
+    q.addBindValue(participantId);
+    q.addBindValue(raceId);
+    q.exec();
+
 }
 
 void DatabaseManager::insertGenreIfNotExist(const QString &sexe)
@@ -157,6 +187,11 @@ void DatabaseManager::removeParticipant(const int id)
     q.prepare(DELETE_PARTICIPANT_SQL);
     q.addBindValue(id);
     q.exec();
+
+    q.prepare(DELETE_PARTICIPANT_RACE_SQL);
+    q.addBindValue(id);
+    q.exec();
+
 }
 
 
@@ -180,11 +215,12 @@ bool DatabaseManager::isRaceExist(const QString &raceName)
      return  (recCount > 0);
 }
 
-void DatabaseManager::addRace(int id_department, const QString name, const QString location, const QString date, const QString description)
+void DatabaseManager::addRace(int race_id, int id_department, const QString name, const QString location, const QString date, const QString description)
 {
       QSqlQuery q;
       q = m_db.exec();
       q.prepare(INSERT_RACE_SQL);
+      q.addBindValue(race_id);
       q.addBindValue(id_department);
       q.addBindValue(name);
       q.addBindValue(location);

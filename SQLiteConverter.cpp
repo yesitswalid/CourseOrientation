@@ -23,9 +23,10 @@ SQLiteConverter()
 
 SQLiteConverter(QString p)
 {
-    m_db = new QSqlDatabase();
-    m_db->addDatabase("QSQLITE", "mySqlite");
-    m_db->setDatabaseName(p);
+    QSqlDatabase dbCopy = QSqlDatabase::addDatabase("QSQLITE", "mySqlite1");
+    dbCopy.setDatabaseName(p);
+    m_db = new QSqlDatabase(dbCopy);
+
     this->path = QDir::currentPath() + "/" + p;
 
     if (!m_db->open())
@@ -100,8 +101,9 @@ bool exportDbTableSchemaToFile(
        return r_dumpingSuccessfull;
 }
 
-void exportSql(QString filePath)
+bool exportSql()
 {
+
     /*
     QProcess dumpProcess;
     QStringList args;
@@ -113,6 +115,11 @@ void exportSql(QString filePath)
     dumpProcess.startCommand(cmd); //sqlite3 requis !!!!!! dans l'environnement (Executer la commande suivante dans un nouveau processus sur un invite de command ou terminal)
     dumpProcess.waitForFinished(); //Attendre que le processus soit entirement finit.
     */
+
+    //Export all data information to serveur web
+
+    return true;
+
 }
 
 

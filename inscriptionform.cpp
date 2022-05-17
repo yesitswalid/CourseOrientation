@@ -68,7 +68,6 @@ void InscriptionForm::clearAllInputs()
 
 void InscriptionForm::Register()
 {
-    //addParticipant(q, QString("Khazri2"), QString("Walid2"), QString("test133@gmail.com"), QString::fromLocal8Bit(QCryptographicHash::hash("mdp12399", QCryptographicHash::Sha256)), QDate::currentDate().toString("dd/MM/yyyy"), 1);
     m_db->addParticipant(ui.nomEdit->text().replace(" ", ""), ui.prenomEdit->text().replace(" ", ""), ui.mailEdit->text().replace(" ", ""), QString(QCryptographicHash::hash((ui.mdpEdit->text().toLocal8Bit()),QCryptographicHash::Sha256).toHex()), ui.dateEdit->text(), this->getSexe());
     QMessageBox::information(this, "Inscription reussi",
                 "Le participant: " + ui.nomEdit->text().replace(" ", "") + " " + ui.prenomEdit->text().replace(" ", "") + " est desormais inscrit !");

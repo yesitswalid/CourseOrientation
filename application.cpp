@@ -4,8 +4,9 @@
 #include <inscriptionform.h>
 #include <statistique.h>
 #include <sqliteconverter.cpp>
-#include <mysqlconverter.cpp>
+#include <mysqldata.cpp>
 #include <QFileInfo>
+#include <racemanager.h>
 
 void Application::init()
 {
@@ -35,10 +36,6 @@ void Application::init()
 
     //QString hostname, QString dbName, QString username, QString password
 
-    //ToDo : A changer mettre les valeur de la configuration check si les valeurs existe dans le fichier pour pouvoir les affecter
-    m_mydb = new MySQLConverter("root", "walid13", "127.0.0.1", "coursorient");
-
-    //qDebug() << m_mydb->SqlDataToMap();
 
     //Gestion du participant
 
@@ -49,14 +46,33 @@ void Application::init()
 
     this->inscription_form = new InscriptionForm();
 
+
     //Config Base de données
     this->config_form = new ConfigForm();
+
+
+    QJsonObject m_obj_values = this->config_form->getDatabaseData();
+
+    //Recuperer les valeurs depuis le config.json valeur de la base de données pour la connexion
+
+    if(m_obj_values.contains("ip") && m_obj_values.contains("port") && m_obj_values.contains("user") && m_obj_values.contains("mot_de_passe") && m_obj_values.contains("database"))
+    {
+         m_mydb = new MySQLData(m_obj_values["user"].toString(), m_obj_values["mot_de_passe"].toString(), m_obj_values["ip"].toString(), m_obj_values["database"].toString());
+    } else {
+        //Hardcoded
+        m_mydb = new MySQLData("root", "walid13", "127.0.0.1", "coursorient");
+    }
 
     //Statistique
 
     this->statistique = new Statistique();
 
+    //Initialisation des courses.
+    initRaces();
+
 }
+
+
 
 Application::Application(QWidget *parent)
     : QMainWindow(parent)
@@ -80,6 +96,60 @@ Application::~Application()
     delete m_db;
     delete m_sqlite;
     delete m_mydb;
+}
+
+
+void Application::initRaces()
+{
+    QSqlQuery query;
+
+    struct RaceManager::Race race;
+
+    QVector<RaceManager::Race> races;
+
+    query = m_mydb->getDatabase()->exec();
+    query.prepare(QString("SELECT * FROM races"));
+    if (!query.exec())
+    {
+        return;
+    }
+
+    while(query.next())
+    {
+        int race_id = query.value(0).toInt();
+        int id_department = query.value(1).toInt();
+        QString raceName = query.value(2).toString();
+        QString date = query.value(3).toString();
+        QString location = query.value(4).toString();
+        float gps_longitude = query.value(5).toFloat();
+        float gps_latitude = query.value(6).toFloat();
+        int difficulty = query.value(7).toInt();
+        int type = query.value(8).toInt();
+        int book = query.value(9).toInt();
+
+        race.name = raceName;
+        race.raceId = race_id;
+        race.departmentId = id_department;
+        race.date = date;
+        race.location = location;
+        race.gpsLongitude = gps_longitude;
+        race.gpsLatitude = gps_latitude;
+        race.difficulty = difficulty;
+        race.type = type;
+        race.book = book;
+
+        races.push_back(race);
+
+        //RaceManager::getInstance()->addRace(race);
+
+    }
+
+    RaceManager::getInstance()->setRaces(races);
+
+    for(const struct RaceManager::Race &r : races)
+    {
+        ui->comboBox->addItem(r.date);
+    }
 }
 
 
@@ -112,8 +182,13 @@ void Application::on_actionGestion_des_participants_triggered()
 
 void Application::on_actionStatistique_triggered()
 {
-    this->statistique->Init();
-    this->statistique->show();
+    if(RaceManager::getInstance()->isRaceSelected())
+    {
+        this->statistique->init();
+        this->statistique->show();
+    } else {
+         QMessageBox::warning(this, "Statistique", "Vous devez selectionner une course pour pouvoir accèder au statistique !");
+    }
 }
 
 
@@ -125,24 +200,37 @@ void Application::on_actionBddConfig_triggered()
 
 void Application::on_actionExporter_vers_triggered()
 {
-    QString s = QFileDialog::getSaveFileName(this,
-                    "Exporter vers (*.sql)",
-                    "",
-                    "sql (*.sql)");
-
-    m_sqlite->exportSql(s);
-
-
+    if(m_sqlite->exportSql())
+    {
+         QMessageBox::information(this, "Exportation", "L'exportation des données des participants on été envoyée au serveur web !");
+    } else {
+         QMessageBox::warning(this, "Exportation", "Erreur lors de l'exportation des données vérifier la base de données du serveur web !");
+    }
 }
 
 
 void Application::on_actionImporter_triggered()
 {
-    QString s = QFileDialog::getExistingDirectory(this,
-                    "Importer vers le dossier");
-    if(m_mydb->importData(s)){
-        QMessageBox::information(this, "Importation", "Importation avec succès les courses ont été sauvegarder dans le repertoire: " + s);
+    if(m_mydb->importData()){
+        QMessageBox::information(this, "Importation", "Importation avec succès les courses ont été sauvegarder");
     } else {
         QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
+    }
+}
+
+
+void Application::on_buttonSelectRace_clicked()
+{
+    for(const struct RaceManager::Race &race : RaceManager::getInstance()->getRaces())
+    {
+
+        if(race.date == ui->comboBox->currentText())
+        {
+            RaceManager::getInstance()->setRaceSelected(true);
+            RaceManager::getInstance()->setRace(race.raceId, race.departmentId, race.name,
+                                                race.date, race.location, race.gpsLongitude, race.gpsLatitude,
+                                                race.difficulty, race.type, race.book);
+            QMessageBox::information(this, "Course", "Vous avez selectionner la course: " + race.name);
+        }
     }
 }

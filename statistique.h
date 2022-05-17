@@ -12,7 +12,7 @@ class Statistique : public QMainWindow
 public:
     explicit Statistique();
     ~Statistique();
-    void Init();
+    void init();
 
 private:
     Ui::Statistique ui;
