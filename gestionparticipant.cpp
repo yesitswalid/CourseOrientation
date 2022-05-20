@@ -8,8 +8,16 @@
 #include <QWidget>
 #include <string.h>
 
+
 GestionParticipant::GestionParticipant()
 {
+    m_db = new DatabaseManager();
+    ui.setupUi(this);
+}
+
+GestionParticipant::GestionParticipant(DatabaseManager *db)
+{
+    m_db = db;
     ui.setupUi(this);
 }
 

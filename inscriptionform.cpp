@@ -8,6 +8,8 @@ InscriptionForm::InscriptionForm()
 {
     ui.setupUi(this);
 
+    m_db = new DatabaseManager();
+
     //1900 à 2022
     ui.dateEdit->setMinimumDate(QDate::currentDate().addYears(-100));
     ui.dateEdit->setMaximumDate(QDate::currentDate());
@@ -16,6 +18,22 @@ InscriptionForm::InscriptionForm()
     ui.comboBox->insertItem(0, "M");
     ui.comboBox->insertItem(1, "Mme");
     ui.comboBox->insertItem(2, "Non binaire");
+}
+
+
+InscriptionForm::InscriptionForm(DatabaseManager *db)
+{
+  ui.setupUi(this);
+  m_db = db;
+  //1900 à 2022
+  ui.dateEdit->setMinimumDate(QDate::currentDate().addYears(-100));
+  ui.dateEdit->setMaximumDate(QDate::currentDate());
+
+  //definit la selection du sexe
+  ui.comboBox->insertItem(0, "M");
+  ui.comboBox->insertItem(1, "Mme");
+  ui.comboBox->insertItem(2, "Non binaire");
+
 }
 
 

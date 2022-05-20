@@ -6,7 +6,6 @@
 #include <configuration.cpp>
 #include <gestionparticipant.h>
 #include <inscriptionform.h>
-#include <statistique.h>
 #include <databasemanager.h>
 #include <configform.h>
 #include <sqliteconverter.cpp>
@@ -26,7 +25,6 @@ public:
     ~Application();
     GestionParticipant *gestion_participant;
     InscriptionForm *inscription_form;
-    Statistique *statistique;
     ConfigForm *config_form;
     DatabaseManager *m_db;
     MySQLData *m_mydb;
@@ -41,8 +39,6 @@ private slots:
 
     void on_actionGestion_des_participants_triggered();
 
-    void on_actionStatistique_triggered();
-
     void on_actionBddConfig_triggered();
 
     void on_actionExporter_vers_triggered();
@@ -55,6 +51,7 @@ private slots:
 private:
     Ui::Application *ui;
     RaceManager *race;
+    QVector <QString> comboLists;
     void init();
     void initRaces();
     void showError(const QSqlError &err);

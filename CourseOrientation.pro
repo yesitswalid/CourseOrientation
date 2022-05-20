@@ -24,8 +24,7 @@ SOURCES += \
     application.cpp \
     mysqldata.cpp \
     racemanager.cpp \
-    sqliteconverter.cpp \
-    statistique.cpp
+    sqliteconverter.cpp
 
 HEADERS += \
     application.h \
@@ -35,16 +34,14 @@ HEADERS += \
     gestionparticipant.h \
     inscriptionform.h \
     racemanager.h \
-    server.h \
-    statistique.h
+    server.h
 
 FORMS += \
     application.ui \
     configform.ui \
     gestioncourse.ui \
     gestionparticipant.ui \
-    inscriptionform.ui \
-    statistique.ui
+    inscriptionform.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

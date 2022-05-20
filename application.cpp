@@ -2,7 +2,6 @@
 #include "ui_application.h"
 #include <gestionparticipant.h>
 #include <inscriptionform.h>
-#include <statistique.h>
 #include <sqliteconverter.cpp>
 #include <mysqldata.cpp>
 #include <QFileInfo>
@@ -39,12 +38,12 @@ void Application::init()
 
     //Gestion du participant
 
-    this->gestion_participant = new GestionParticipant();
+    this->gestion_participant = new GestionParticipant(m_db);
     this->gestion_participant->init();
 
     //Inscription Formulaire
 
-    this->inscription_form = new InscriptionForm();
+    this->inscription_form = new InscriptionForm(m_db);
 
 
     //Config Base de données
@@ -63,9 +62,6 @@ void Application::init()
         m_mydb = new MySQLData("root", "walid13", "127.0.0.1", "coursorient");
     }
 
-    //Statistique
-
-    this->statistique = new Statistique();
 
     //Initialisation des courses.
     initRaces();
@@ -90,7 +86,6 @@ Application::~Application()
     delete ui;
     delete gestion_participant;
     delete inscription_form;
-    delete statistique;
     delete config_form;
     delete configuration;
     delete m_db;
@@ -146,9 +141,15 @@ void Application::initRaces()
 
     RaceManager::getInstance()->setRaces(races);
 
+    ui->comboBox->addItem("-");
+    int i = 0;
+    comboLists.insert(0, "-");
     for(const struct RaceManager::Race &r : races)
     {
-        ui->comboBox->addItem(r.date);
+        i++;
+        ui->comboBox->addItem(r.date + " "+ r.name);
+        comboLists.insert(i, r.date);
+        // Remplir le tableau avec les id des races
     }
 }
 
@@ -169,6 +170,12 @@ void Application::on_actionConfiguration_triggered()
 
 void Application::on_actionInscription_triggered()
 {
+    if(RaceManager::getInstance()->isRaceSelected())
+    {
+         this->inscription_form->show();
+    } else {
+         QMessageBox::warning(this, "Inscription", "Vous devez selectionner une course pour pouvoir accèder à cette page !");
+    }
     this->inscription_form->show();
 }
 
@@ -178,19 +185,6 @@ void Application::on_actionGestion_des_participants_triggered()
      this->gestion_participant->createTableView();
      this->gestion_participant->show();
 }
-
-
-void Application::on_actionStatistique_triggered()
-{
-    if(RaceManager::getInstance()->isRaceSelected())
-    {
-        this->statistique->init();
-        this->statistique->show();
-    } else {
-         QMessageBox::warning(this, "Statistique", "Vous devez selectionner une course pour pouvoir accèder au statistique !");
-    }
-}
-
 
 void Application::on_actionBddConfig_triggered()
 {
@@ -221,16 +215,45 @@ void Application::on_actionImporter_triggered()
 
 void Application::on_buttonSelectRace_clicked()
 {
+
+    //Savoir grace a l'index pour chaque course si dans une course la date correspond a la chaine de caractere de la date de la combolist
+    //et affecter les parametres de la course à l'application de l'organisateur.
+
     for(const struct RaceManager::Race &race : RaceManager::getInstance()->getRaces())
     {
 
-        if(race.date == ui->comboBox->currentText())
+        if(race.date == comboLists.at(ui->comboBox->currentIndex()))
         {
             RaceManager::getInstance()->setRaceSelected(true);
             RaceManager::getInstance()->setRace(race.raceId, race.departmentId, race.name,
                                                 race.date, race.location, race.gpsLongitude, race.gpsLatitude,
                                                 race.difficulty, race.type, race.book);
             QMessageBox::information(this, "Course", "Vous avez selectionner la course: " + race.name);
+
+            if(m_mydb->importData()){
+                QMessageBox::information(this, "Importation", "Importation avec succès les courses ont été sauvegarder");
+            } else {
+                QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
+            }
+
+
+            //action fichier
+            for(QAction *ac : ui->menuParam_tre->actions())
+            {
+                if(!ac->isEnabled())
+                {
+                    ac->setEnabled(true);
+                }
+            }
+
+            //action fenetre
+            for(QAction *action : ui->menuFen_tre->actions())
+            {
+                if(!action->isEnabled())
+                {
+                    action->setEnabled(true);
+                }
+            }
         }
     }
 }

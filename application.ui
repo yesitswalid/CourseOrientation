@@ -78,7 +78,6 @@
      <string>Edition</string>
     </property>
     <addaction name="actionBddConfig"/>
-    <addaction name="actionParam_tre"/>
    </widget>
    <addaction name="menuParam_tre"/>
    <addaction name="menuFen_tre"/>
@@ -91,11 +90,17 @@
    </property>
   </action>
   <action name="actionExporter">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Exporter</string>
    </property>
   </action>
   <action name="actionImporter">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Importer</string>
    </property>
@@ -116,21 +121,33 @@
    </property>
   </action>
   <action name="actionAccueil">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Accueil</string>
    </property>
   </action>
   <action name="actionInscription">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Inscription</string>
    </property>
   </action>
   <action name="actionStatistique">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Statistique</string>
    </property>
   </action>
   <action name="actionGestion_des_participants">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Gestion des participants</string>
    </property>

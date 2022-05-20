@@ -14,6 +14,7 @@ class GestionParticipant : public QMainWindow
 
 public:
      GestionParticipant();
+     GestionParticipant(DatabaseManager *db);
     ~GestionParticipant();
     void createTableView();
     void init();

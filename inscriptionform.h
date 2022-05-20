@@ -11,6 +11,7 @@ class InscriptionForm : public QMainWindow
 
 public:
     InscriptionForm();
+    InscriptionForm(DatabaseManager *m_db);
     ~InscriptionForm();
     void Register();
     int getSexe();
