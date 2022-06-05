@@ -5,6 +5,7 @@
 #include <QSqlError>
 #include <configuration.cpp>
 #include <gestionparticipant.h>
+#include <gestionportique.h>
 #include <inscriptionform.h>
 #include <databasemanager.h>
 #include <configform.h>
@@ -25,6 +26,7 @@ public:
     ~Application();
     GestionParticipant *gestion_participant;
     InscriptionForm *inscription_form;
+    GestionPortique *gestion_portique;
     ConfigForm *config_form;
     DatabaseManager *m_db;
     MySQLData *m_mydb;
@@ -47,6 +49,9 @@ private slots:
 
 
     void on_buttonSelectRace_clicked();
+
+
+    void on_actionPortique_triggered();
 
 private:
     Ui::Application *ui;

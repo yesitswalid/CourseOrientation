@@ -1,6 +1,7 @@
 #include "application.h"
 #include "ui_application.h"
 #include <gestionparticipant.h>
+#include <gestionportique.h>
 #include <inscriptionform.h>
 #include <sqliteconverter.cpp>
 #include <mysqldata.cpp>
@@ -49,14 +50,22 @@ void Application::init()
     //Config Base de données
     this->config_form = new ConfigForm();
 
+    //Gestion Portique
+    this->gestion_portique = new GestionPortique();
+
 
     QJsonObject m_obj_values = this->config_form->getDatabaseData();
 
     //Recuperer les valeurs depuis le config.json valeur de la base de données pour la connexion
 
-    if(m_obj_values.contains("ip") && m_obj_values.contains("port") && m_obj_values.contains("user") && m_obj_values.contains("mot_de_passe") && m_obj_values.contains("database"))
+    if(m_obj_values.contains("ip") && m_obj_values.contains("port") &&
+            m_obj_values.contains("user") && m_obj_values.contains("mot_de_passe")
+            && m_obj_values.contains("database"))
     {
-         m_mydb = new MySQLData(m_obj_values["user"].toString(), m_obj_values["mot_de_passe"].toString(), m_obj_values["ip"].toString(), m_obj_values["database"].toString());
+         m_mydb = new MySQLData(m_obj_values["user"].toString(),
+                 m_obj_values["mot_de_passe"].toString(),
+                 m_obj_values["ip"].toString(),
+                 m_obj_values["database"].toString());
     } else {
         //Hardcoded
         m_mydb = new MySQLData("root", "walid13", "127.0.0.1", "coursorient");
@@ -176,7 +185,6 @@ void Application::on_actionInscription_triggered()
     } else {
          QMessageBox::warning(this, "Inscription", "Vous devez selectionner une course pour pouvoir accèder à cette page !");
     }
-    this->inscription_form->show();
 }
 
 
@@ -206,7 +214,7 @@ void Application::on_actionExporter_vers_triggered()
 void Application::on_actionImporter_triggered()
 {
     if(m_mydb->importData()){
-        QMessageBox::information(this, "Importation", "Importation avec succès les courses ont été sauvegarder");
+        QMessageBox::information(this, "Importation", "Importation avec succès des données du site web !");
     } else {
         QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
     }
@@ -231,7 +239,7 @@ void Application::on_buttonSelectRace_clicked()
             QMessageBox::information(this, "Course", "Vous avez selectionner la course: " + race.name);
 
             if(m_mydb->importData()){
-                QMessageBox::information(this, "Importation", "Importation avec succès les courses ont été sauvegarder");
+                QMessageBox::information(this, "Importation", "Importation avec succès des données du site web !");
             } else {
                 QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
             }
@@ -257,3 +265,15 @@ void Application::on_buttonSelectRace_clicked()
         }
     }
 }
+
+
+void Application::on_actionPortique_triggered()
+{
+    if(RaceManager::getInstance()->isRaceSelected())
+    {
+         this->gestion_portique->show();
+    } else {
+         QMessageBox::warning(this, "Gestion Portique", "Vous devez selectionner une course pour pouvoir accèder à cette page !");
+    }
+}
+

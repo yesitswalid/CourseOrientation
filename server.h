@@ -4,12 +4,19 @@
 
 #define PORT 1234
 
+#define DEFAULT 0
+#define RAZ 1
+#define DATA 2
+
 class Server : public QObject
 {
     Q_OBJECT
 private:
     QUdpSocket * socket;
 public:
+    int MODE;
+    QHostAddress lecteurSender;
+    int lecteurPort;
     Server(QObject* parent = 0) : QObject(parent)
     {
         init();
@@ -20,13 +27,14 @@ public:
         socket->bind(PORT);
         socket->connect(socket, SIGNAL(readyRead()),this,SLOT(readPendingDiagrams()));
         qDebug() << "Attente de données depuis le port: " << PORT << " ... \n";
+        MODE = DEFAULT;
     }
 
 
 public slots:
     void readPendingDiagrams()
     {
-        qDebug() << "Lire depuis le thread:" << QThread::currentThread();
+        //qDebug() << "Lire depuis le thread:" << QThread::currentThread();
 
         QByteArray buffer;
 
@@ -37,16 +45,45 @@ public slots:
 
         socket->readDatagram(buffer.data(), buffer.size(),
                              &sender, &senderPort);
-
         qDebug() << "Client from: " << sender.toString();
         qDebug() << "Client port: " << senderPort;
         qDebug() << "Buffer: " << buffer;
+
+        lecteurSender = sender;
+        lecteurPort = senderPort;
+
+        socket->writeDatagram(QByteArray("R"), lecteurSender, lecteurPort);
+
+
+        if(MODE == DEFAULT)
+        {
+
+            qDebug() << "Client from: " << sender.toString();
+            qDebug() << "Client port: " << senderPort;
+            qDebug() << "Buffer: " << buffer;
+
+            lecteurSender = sender;
+            lecteurPort = senderPort;
+
+            socket->writeDatagram(QByteArray("R"), lecteurSender, lecteurPort);
+            MODE = RAZ;
+        } else if(MODE == RAZ) {
+            if(!buffer.contains("acknowledged"))
+            {
+                qDebug() << "Client from: " << sender.toString();
+                qDebug() << "Client port: " << senderPort;
+                qDebug() << "Buffer: " << buffer;
+            }
+        }
+
+        /*
 
         //Pour supprimer l'ancienne données et recuperer l'id
         if(buffer.contains("INIT"))
         {
 
             socket->writeDatagram(QByteArray("R"), sender, senderPort);
+            MODE = RAZ;
             //clientPortique = sender, senderPort
 
             //PORTIQUE_DATA (Recupere les données de balises)
@@ -57,6 +94,6 @@ public slots:
                         socket->writeDatagram(QByteArray("Numero serie: J388B"), sender, senderPort);
         }
        //char *mess = "Salut venant du serveur";
-
+       */
     }
 };

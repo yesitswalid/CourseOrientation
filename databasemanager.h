@@ -9,30 +9,60 @@
 ///////////////////////////// CREER UNE TABLE //////////////////////////////////////////////////
 
 const auto PARTICIPANTS_SQL = QString(R"(
-    create table if not exists participants(id integer primary key, lastname varchar, firstname varchar, mail varchar, password varchar, year varchar,
-                       genre_id integer, rfid integer DEFAULT 0)
+    create table if not exists participants(
+    id integer primary key,
+    lastname varchar,
+    firstname varchar,
+    mail varchar,
+    password varchar,
+    year varchar,
+    genre_id integer,
+    rfid integer DEFAULT 0)
     )");
 
 const auto PARTICIPANTS_RACES_SQL = QString(R"(
-    create table if not exists participant_races(id integer primary key, participant_id integer, race_id integer, finger integer DEFAULT NULL)
+    create table if not exists participant_races(
+    id integer primary key,
+    participant_id integer,
+    race_id integer,
+    finger integer DEFAULT NULL)
     )");
 
 const auto GENDERS_SQL = QString(R"(
-    create table if not exists genders(id integer primary key, sexe varchar)
+    create table if not exists genders(
+    id integer primary key,
+    sexe varchar)
     )");
 
 
 const auto RACES_SQL = QString(R"(
-    create table if not exists races(id integer primary key, id_department integer, name varchar, location varchar, date datetime, description varchar)
+    create table if not exists races(
+    id integer primary key,
+    id_department integer,
+    name varchar,
+    location varchar,
+    date datetime,
+    description varchar)
     )");
 
 const auto CHECKPOINTS_SQL = QString(R"(
-    create table if not exists checkpoints(id integer primary key, altitude varchar, longitude vachar, attitude varchar, race_id integer, order_id varchar, points integer)
+    create table if not exists checkpoints(
+    id integer primary key,
+    altitude varchar,
+    longitude vachar,
+    attitude varchar,
+    race_id integer,
+    order_id varchar,
+    points integer)
 )");
 
 
 const auto ARRIVALS_SQL = QString(R"(
-    create table if not exists checkpoints(id integer primary key, participant_id integer, checkpoint_id integer, datetime varchar)
+    create table if not exists arrivals(
+    id integer primary key,
+    participant_id integer,
+    checkpoint_id integer,
+    datetime varchar)
 )");
 
 
@@ -111,6 +141,7 @@ public:
 
     //PARTIE PARTICIPANT
     void addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId);
+
     bool isParticipantExist(const QString &mail);
     void insertGenreIfNotExist(const QString &sexe);
     void removeParticipant(const int id);

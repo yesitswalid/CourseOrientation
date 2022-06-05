@@ -127,7 +127,14 @@ void GestionParticipant::on_updateButton_clicked()
     QSqlQuery q;
 
     //Préparer la requete pour mettre à jour les information du participant
-    q.prepare("UPDATE participants SET lastname=:lastname, firstname=:firstname, mail=:mail, password=:password, year=:year, genre_id=:genre_id, rfid=:rfid WHERE id=:id");
+    q.prepare("UPDATE participants SET lastname=:lastname, "
+              "firstname=:firstname,"
+              "mail=:mail,"
+              "password=:password,"
+              "year=:year,"
+              "genre_id=:genre_id,"
+              "rfid=:rfid"
+              " WHERE id=:id");
     //récupérer toutes les valeur du model du tableau de chaque colonne
     q.bindValue(":id", selectedIndexes[0].data().value<int>());
     q.bindValue(":lastname", selectedIndexes[1].data().value<QString>());
@@ -149,8 +156,15 @@ void GestionParticipant::on_updateButton_clicked()
     }
 
     q.bindValue(":rfid", selectedIndexes[7].data().value<int>());
-    qDebug() << q.exec(); //verification True = la requete a bien été mis à jour ou false erreur du sql
-    this->createTableView(); //recréer le model du tableau pour rafraichir les mise à jour éffectuer des participants
+    if(q.exec()) //verification True = la requete a bien été mis à jour ou false erreur du sql
+    {
+        QMessageBox::information(this, "Gestion des Participants", "Le participant : "
+         "" + selectedIndexes[1].data().value<QString>() + " "
+         "" + selectedIndexes[2].data().value<QString>() + " à été mis à jour avec succès !");
+        this->createTableView(); //recréer le model du tableau pour rafraichir les mise à jour éffectuer des participants
+    } else {
+        QMessageBox::warning(this, "Gestion des Participants", "Erreur lors de la mise à jour du participant");
+    }
 
 }
 

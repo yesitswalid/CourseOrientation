@@ -7,6 +7,7 @@ requires(qtConfig(tableview))
 
 #greaterThan(QT_MAJOR_VERSION, 4): QT += core gui widgets sql
 
+
 CONFIG += c++11
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -19,10 +20,12 @@ SOURCES += \
     databasemanager.cpp \
     gestioncourse.cpp \
     gestionparticipant.cpp \
+    gestionportique.cpp \
     inscriptionform.cpp \
     main.cpp \
     application.cpp \
     mysqldata.cpp \
+    portique.cpp \
     racemanager.cpp \
     sqliteconverter.cpp
 
@@ -32,7 +35,9 @@ HEADERS += \
     databasemanager.h \
     gestioncourse.h \
     gestionparticipant.h \
+    gestionportique.h \
     inscriptionform.h \
+    portique.h \
     racemanager.h \
     server.h
 
@@ -41,6 +46,7 @@ FORMS += \
     configform.ui \
     gestioncourse.ui \
     gestionparticipant.ui \
+    gestionportique.ui \
     inscriptionform.ui
 
 # Default rules for deployment.

@@ -1,4 +1,5 @@
 #include "databasemanager.h"
+#include "racemanager.h"
 #include <QMessageBox>
 
 
@@ -52,6 +53,8 @@ QSqlError DatabaseManager::initDb()
         return q.lastError();
     if (!q.exec(RACES_SQL))
         return q.lastError();
+    if(!q.exec(PARTICIPANTS_RACES_SQL))
+        return q.lastError();
     if (!q.exec(CHECKPOINTS_SQL))
         return q.lastError();
     if (!q.exec(ARRIVALS_SQL))
@@ -88,6 +91,8 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
     if (!q.exec(GENDERS_SQL))
         return q.lastError();
     if (!q.exec(RACES_SQL))
+        return q.lastError();
+    if(!q.exec(PARTICIPANTS_RACES_SQL))
         return q.lastError();
     if (!q.exec(CHECKPOINTS_SQL))
         return q.lastError();
@@ -139,7 +144,11 @@ bool DatabaseManager::isParticipantRaceExist(int participantId)
      return  (recCount > 0);
 }
 
-void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId)
+void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname,
+                                     const QString &mail,
+                                     const QString &password,
+                                     const QString &year,
+                                     int genreId)
 {
     QSqlQuery q;
     q = m_db.exec();
@@ -151,8 +160,27 @@ void DatabaseManager::addParticipant(const QString &lastname, const QString &fir
     q.addBindValue(year);
     q.addBindValue(genreId);
     q.exec();
+
+    int participant_id = q.lastInsertId().toInt();
+    int race_id = RaceManager::getInstance()->getRaceId();
+    qDebug() << participant_id << race_id;
+
+    //this->addParticipantRace(participant_id, race_id);
 }
 
+/*
+int DatabaseManager::getParticipantData(QString email)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare(SELECT_DATA_PARTICIPANT);
+    q.addBindValue(email);
+    q.exec();
+
+    return q
+
+}
+*/
 void DatabaseManager::addParticipantRace(int participantId, int raceId)
 {
     QSqlQuery q;

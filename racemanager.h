@@ -35,7 +35,16 @@ public:
 
     QVector<Race> getRaces();
     void setRaces(QVector<Race> races);
-    void setRace(int raceId, int departmentId, QString name, QString date, QString location, float gpsLongitude, float gpsLatitude, int difficulty, int type, int book);
+    void setRace(int raceId,
+                 int departmentId,
+                 QString name,
+                 QString date,
+                 QString location,
+                 float gpsLongitude,
+                 float gpsLatitude,
+                 int difficulty,
+                 int type,
+                 int book);
 
     QString getName();
     void setName(QString name);

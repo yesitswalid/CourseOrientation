@@ -60,12 +60,6 @@ MySQLData(QString username, QString password, QString hostname, QString dbName)
         qWarning() << "Le serveur ne communique pas avec la base de données !";
     }
 
-    QStringList tables = m_db->tables();
-    qDebug() << tables.count();
-      for (int i=0; i< tables.count(); ++i) {
-          qDebug() << tables[i];
-      }
-
     //Constructeur
 }
 
@@ -121,124 +115,89 @@ const auto ARRIVALS_SQL = QString(R"(
 
 bool importData()
 {
-    //QDir dir;
-    //QFileInfo fileInfo;
-    QString connectionName;
-    QSqlQuery query;
 
-    query = m_db->exec();
+   QString connectionName;
+   QSqlQuery query;
+   query = m_db->exec();
+   connectionName = "myNewDb";
+   query.prepare(QString("SELECT email, password, firstname, lastname, year, gender FROM participants"));
+   if (!query.exec())
+   {
+       return false;
+   }
+     DatabaseManager m_db_saver = DatabaseManager();
+     QSqlError err = m_db_saver.initDb(connectionName);
 
-    connectionName = "myNewDb";
-    //dir.setPath(dirPath);
+     while(query.next())
+     {
+             QString email = query.value(0).toString();
+             QString password = query.value(1).toString();
+             QString firstname = query.value(2).toString();
+             QString lastname = query.value(3).toString();
+             QString year = query.value(4).toString();
+             int genderId = getConvertFormatSexe(query.value(5).toString());
 
-
-    /*
-    query.prepare(QString("SELECT * FROM races"));
-
-    if (!query.exec()) {
-        return false;
+             if(!m_db_saver.isParticipantExist(email))
+             {
+                 m_db_saver.addParticipant(lastname, firstname, email, password, year, genderId); //Ajouter un participant
+             }
     }
-    */
 
-    /*
-    while (query.next())
-    {
-       race_ids.push_back(query.value(0).toInt());
-    }*/
+     query.prepare(QString("SELECT id, id_department, name, date, location FROM races"));
 
-    //for(int race_id : race_ids)
-    //{
-       query.prepare(QString("SELECT email, password, firstname, lastname, year, gender FROM participants"));
+     if (!query.exec())
+     {
+         return false;
+     }
 
-       if (!query.exec())
-       {
-           return false;
-       }
+     while(query.next())
+     {
+         int race_id = query.value(0).toInt();
+         int id_department = query.value(1).toInt();
+         QString raceName = query.value(2).toString();
+         QString date = query.value(3).toString();
+         QString location = query.value(4).toString();
 
-       /*
-       fileInfo.setFile(dir.path() + "/course_" + QString::number(race_id) + ".db");
-       qDebug() << fileInfo.path();
-       if(!fileInfo.exists())
-       {
-             DatabaseManager m_db_saver = DatabaseManager(dir.path() + "/course_" + QString::number(race_id) + ".db");
-             QSqlError err = m_db_saver.initDb(connectionName);
+         qDebug() << race_id << id_department << raceName << date << location;
 
-             if (err.type() != QSqlError::NoError) {
-                 return false;
-             }*/
+         //Application
 
-             DatabaseManager m_db_saver = DatabaseManager();
-             QSqlError err = m_db_saver.initDb(connectionName);
-
-             while(query.next())
-             {
-                     QString email = query.value(0).toString();
-                     QString password = query.value(1).toString();
-                     QString firstname = query.value(2).toString();
-                     QString lastname = query.value(3).toString();
-                     QString year = query.value(4).toString();
-                     int genderId = getConvertFormatSexe(query.value(5).toString());
-
-                     if(!m_db_saver.isParticipantExist(email))
-                     {
-                         m_db_saver.addParticipant(lastname, firstname, email, password, year, genderId); //Ajouter un participant
-                     }
-            }
-
-             query.prepare(QString("SELECT id, id_department, name, date, location FROM races"));
-
-             if (!query.exec())
-             {
-                 return false;
-             }
-
-             while(query.next())
-             {
-                 int race_id = query.value(0).toInt();
-                 int id_department = query.value(1).toInt();
-                 QString raceName = query.value(2).toString();
-                 QString date = query.value(3).toString();
-                 QString location = query.value(4).toString();
-
-                 qDebug() << race_id << id_department << raceName << date << location;
-
-                 //Application
-
-                 if(!m_db_saver.isRaceExist(raceName))
-                 {
-                     m_db_saver.addRace(race_id, id_department, raceName, location, date, "N/A");   //Ajouter une course
-                 }
-             }
+         if(!m_db_saver.isRaceExist(raceName))
+         {
+             m_db_saver.addRace(race_id, id_department, raceName, location, date, "N/A");   //Ajouter une course
+         }
+     }
 
 
-             query.prepare(QString("SELECT p_race.participant_id, p_race.race_id FROM participants as p, participants_races as p_race WHERE p_race.participant_id=p.id"));
+     query.prepare(QString("SELECT p_race.participant_id, p_race.race_id FROM participants as p,"
+                           " participants_races as p_race WHERE p_race.participant_id=p.id"));
 
-             if (!query.exec())
-             {
-                 return false;
-             }
+     if (!query.exec())
+     {
+         return false;
+     }
 
-             while(query.next())
-             {
-                 int participant_id = query.value(0).toInt();
-                 int race_id = query.value(1).toInt();
+     while(query.next())
+     {
+         int participant_id = query.value(0).toInt();
+         int race_id = query.value(1).toInt();
 
 
-                 qDebug() << participant_id << race_id;
+         qDebug() << participant_id << race_id;
 
-                 //Application
+         //Application
 
-                 if(!m_db_saver.isParticipantRaceExist(participant_id))
-                 {
-                     m_db_saver.addParticipantRace(participant_id, race_id);  //Ajouter les participants sur chaque course
-                 }
-             }
+         if(!m_db_saver.isParticipantRaceExist(participant_id))
+         {
+             m_db_saver.addParticipantRace(participant_id, race_id);  //Ajouter les participants sur chaque course
+         }
+     }
 
-             //ToDo : finish
-            m_db_saver.getDb().removeDatabase(connectionName);
-            m_db_saver.getDb().close();
+     //ToDo : finish
+    m_db_saver.getDb().removeDatabase(connectionName);
+    m_db_saver.getDb().close();
 
-            return true;
+    return true;
 }
 
 

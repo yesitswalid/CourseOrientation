@@ -68,10 +68,9 @@
     <property name="title">
      <string>Fenêtre</string>
     </property>
-    <addaction name="actionAccueil"/>
     <addaction name="actionInscription"/>
-    <addaction name="actionStatistique"/>
     <addaction name="actionGestion_des_participants"/>
+    <addaction name="actionPortique"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
     <property name="title">
@@ -120,12 +119,12 @@
     <string>Configuration</string>
    </property>
   </action>
-  <action name="actionAccueil">
+  <action name="actionPortique">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Accueil</string>
+    <string>Portique</string>
    </property>
   </action>
   <action name="actionInscription">
@@ -134,14 +133,6 @@
    </property>
    <property name="text">
     <string>Inscription</string>
-   </property>
-  </action>
-  <action name="actionStatistique">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Statistique</string>
    </property>
   </action>
   <action name="actionGestion_des_participants">
