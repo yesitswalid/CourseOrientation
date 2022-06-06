@@ -9,7 +9,7 @@
 #include <inscriptionform.h>
 #include <databasemanager.h>
 #include <configform.h>
-#include <sqliteconverter.cpp>
+#include <SQLiteConverter.cpp>
 #include <mysqldata.cpp>
 #include <racemanager.h>
 

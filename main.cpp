@@ -1,8 +1,6 @@
 #include "application.h"
 
 #include <QApplication>
-
-#include <sqliteconverter.cpp>
 #include <QString>
 #include <server.h>
 

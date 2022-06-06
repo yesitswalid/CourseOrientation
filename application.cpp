@@ -3,7 +3,7 @@
 #include <gestionparticipant.h>
 #include <gestionportique.h>
 #include <inscriptionform.h>
-#include <sqliteconverter.cpp>
+#include <SQLiteConverter.cpp>
 #include <mysqldata.cpp>
 #include <QFileInfo>
 #include <racemanager.h>

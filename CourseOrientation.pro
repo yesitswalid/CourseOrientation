@@ -1,4 +1,4 @@
-#QT       += core gui widgets sql
+#QT       += core gui widgets sql serialport
 
 #requires(qtConfig(tableview))
 
@@ -15,10 +15,10 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    SQLiteConverter.cpp \
     configform.cpp \
     configuration.cpp \
     databasemanager.cpp \
-    gestioncourse.cpp \
     gestionparticipant.cpp \
     gestionportique.cpp \
     inscriptionform.cpp \
@@ -26,14 +26,12 @@ SOURCES += \
     application.cpp \
     mysqldata.cpp \
     portique.cpp \
-    racemanager.cpp \
-    sqliteconverter.cpp
+    racemanager.cpp
 
 HEADERS += \
     application.h \
     configform.h \
     databasemanager.h \
-    gestioncourse.h \
     gestionparticipant.h \
     gestionportique.h \
     inscriptionform.h \
@@ -44,7 +42,6 @@ HEADERS += \
 FORMS += \
     application.ui \
     configform.ui \
-    gestioncourse.ui \
     gestionparticipant.ui \
     gestionportique.ui \
     inscriptionform.ui
