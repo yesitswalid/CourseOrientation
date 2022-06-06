@@ -2,7 +2,7 @@
 
 #requires(qtConfig(tableview))
 
-QT += core gui sql widgets widgets network
+QT += core gui sql widgets widgets network serialport
 requires(qtConfig(tableview))
 
 #greaterThan(QT_MAJOR_VERSION, 4): QT += core gui widgets sql
