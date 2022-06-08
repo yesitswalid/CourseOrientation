@@ -137,6 +137,8 @@ bool importData()
              QString year = query.value(4).toString();
              int genderId = getConvertFormatSexe(query.value(5).toString());
 
+             qDebug() << email << password << firstname << lastname << year << genderId;
+
              if(!m_db_saver.isParticipantExist(email))
              {
                  m_db_saver.addParticipant(lastname, firstname, email, password, year, genderId); //Ajouter un participant

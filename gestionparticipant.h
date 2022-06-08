@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QtSql>
 #include <QtWidgets>
+#include <QByteArray>
 #include <ui_gestionparticipant.h>
 #include "databasemanager.h"
 
@@ -23,6 +24,12 @@ private slots:
     void on_suprButton_clicked();
 
     void on_updateButton_clicked();
+
+    void on_razButton_clicked();
+
+    void razGetData(QByteArray);
+
+    void finishedRead();
 
 private:
     Ui::GestionParticipant ui;

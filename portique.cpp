@@ -36,7 +36,6 @@ Portique::Portique()
 
 
         connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
-        qDebug() << serial->readAll();
 
     } else {
         qDebug() << "Erreur lors de la lecture !" << serial->error();
@@ -44,10 +43,30 @@ Portique::Portique()
 
 }
 
+void Portique::doWork()
+{
+    bool isRead = true;
+    while(isRead)
+    {
+       QByteArray data = serial->readAll();
+
+
+       if(data.contains("TEST"))
+       {
+           emit getData(data);
+           isRead = false;
+       }
+    }
+    emit workFinished();
+}
+
 void Portique::serialReceived()
 {
     QByteArray data = serial->readAll();
-    qDebug() << data;
 
-
+    if(data.contains("TEST"))
+    {
+        qDebug() << data;
+        serial->deleteLater();
+    }
 }

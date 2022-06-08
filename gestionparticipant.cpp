@@ -1,5 +1,7 @@
 #include "gestionparticipant.h"
 #include "ui_gestionparticipant.h"
+#include <QThread>
+#include <portique.h>
 #include "databasemanager.h"
 #include <QtSql>
 #include <QMessageBox>
@@ -164,6 +166,52 @@ void GestionParticipant::on_updateButton_clicked()
         this->createTableView(); //recréer le model du tableau pour rafraichir les mise à jour éffectuer des participants
     } else {
         QMessageBox::warning(this, "Gestion des Participants", "Erreur lors de la mise à jour du participant");
+    }
+
+}
+
+
+void GestionParticipant::razGetData(QByteArray data)
+{
+    qDebug() << data;
+    qDebug() << "getter";
+}
+
+void GestionParticipant::finishedRead()
+{
+    qDebug() << "finished !!!";
+}
+
+void GestionParticipant::on_razButton_clicked()
+{
+    //Recuperer toutes les valeurs situes dans le tableau et récuperer seulement la ligne selectionner pour pouvoir récuperer les valeur de cette ligne.
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+    qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
+
+    if(ui.razButton->isEnabled())
+    {
+         ui.razButton->setEnabled(false);
+
+
+         QThread *thread = new QThread();
+         Portique *portique = new Portique();
+
+         portique->moveToThread(thread);
+         thread->start();
+
+         connect(thread, SIGNAL(started()), portique, SLOT(doWork()));
+
+         connect(portique, SIGNAL(getData(QByteArray)), this, SLOT(razGetData(QByteArray)));
+         connect(portique, SIGNAL(workFinished()), this, SLOT(finishedRead()));
+
+         connect(portique, SIGNAL(workFinished()), thread, SLOT(quit()));
+
+         connect(portique, SIGNAL(workFinished()), portique, SLOT(deleteLater()));
+         connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+
+         qDebug() << "Recuperation de la data..";
+
+         //ToDo : connect signal..
     }
 
 }

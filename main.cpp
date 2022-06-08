@@ -1,5 +1,4 @@
 #include "application.h"
-
 #include <QApplication>
 #include <QString>
 #include <server.h>
