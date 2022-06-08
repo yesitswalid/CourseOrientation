@@ -7,7 +7,7 @@
 Portique::Portique()
 {
     serial = new QSerialPort();
-    serial->setPortName("ttyS0");
+    serial->setPortName("/dev/ttyUSB0");
     if(!serial->setBaudRate(QSerialPort::Baud9600))
     {
         qDebug() << "Erreur lors de l'initialisation du baude rate à 9600";
@@ -45,21 +45,24 @@ Portique::Portique()
 
 void Portique::doWork()
 {
+    qDebug() << "doWork";
     bool isRead = true;
     while(isRead)
     {
+
        QByteArray data = serial->readAll();
 
 
-       if(data.contains("TEST"))
+       if(!data.isEmpty())
        {
            emit getData(data);
            isRead = false;
        }
     }
 
-    serial->close();
+    //serial->close();
     emit workFinished();
+    serial->flush();
 }
 
 void Portique::serialReceived()

@@ -8,6 +8,8 @@
 #include <QSqlRelationalDelegate>
 #include <QDataWidgetMapper>
 #include <QWidget>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <string.h>
 
 
@@ -15,12 +17,91 @@ GestionParticipant::GestionParticipant()
 {
     m_db = new DatabaseManager();
     ui.setupUi(this);
+
+
+
+    // GESTION PORTIQUE //
+
+
+    serial = new QSerialPort();
+    serial->setPortName("/dev/ttyUSB0");
+    if(!serial->setBaudRate(QSerialPort::Baud9600))
+    {
+        qDebug() << "Erreur lors de l'initialisation du baude rate à 9600";
+        return;
+    }
+
+    if(!serial->setStopBits(QSerialPort::OneStop))
+    {
+        qDebug() << "Erreur lors de l'initialisation du stop bit à 1";
+        return;
+    }
+
+    if(!serial->setDataBits(QSerialPort::Data8))
+    {
+        qDebug() << "Erreur lors de l'initialisation à 8 bits";
+        return;
+    }
+
+    if(!serial->setFlowControl(QSerialPort::NoFlowControl))
+    {
+        qDebug() << "Erreur lors de l'initialisation du flux de controle en non flux de controle";
+    }
+
+    if(serial->open(QIODevice::ReadOnly))
+    {
+        connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
+        //connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
+
+    } else {
+        qDebug() << "Erreur lors de la lecture !" << serial->error();
+    }
+
 }
 
 GestionParticipant::GestionParticipant(DatabaseManager *db)
 {
     m_db = db;
     ui.setupUi(this);
+
+    // GESTION PORTIQUE //
+
+
+    serial = new QSerialPort();
+    serial->setPortName("/dev/ttyUSB0");
+    if(!serial->setBaudRate(QSerialPort::Baud9600))
+    {
+        qDebug() << "Erreur lors de l'initialisation du baude rate à 9600";
+        return;
+    }
+
+    if(!serial->setStopBits(QSerialPort::OneStop))
+    {
+        qDebug() << "Erreur lors de l'initialisation du stop bit à 1";
+        return;
+    }
+
+    if(!serial->setDataBits(QSerialPort::Data8))
+    {
+        qDebug() << "Erreur lors de l'initialisation à 8 bits";
+        return;
+    }
+
+    if(!serial->setFlowControl(QSerialPort::NoFlowControl))
+    {
+        qDebug() << "Erreur lors de l'initialisation du flux de controle en non flux de controle";
+    }
+
+    if(serial->open(QIODevice::ReadOnly))
+    {
+        connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
+        //connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
+
+    } else {
+        qDebug() << "Erreur lors de la lecture !" << serial->error();
+    }
+
+
 }
 
 
@@ -94,6 +175,7 @@ void GestionParticipant::createTableView()
 
     //definir la selection de l'index par default de la ligne et de la colonne donc ligne 0 et colonne 0
     ui.participantTable->setCurrentIndex(model->index(0, 0));
+
 }
 
 void GestionParticipant::createMenuBar()
@@ -170,6 +252,28 @@ void GestionParticipant::on_updateButton_clicked()
 
 }
 
+void GestionParticipant::serialReceived()
+{
+
+    while(serial->canReadLine())
+    {
+        QByteArray data = serial->readLine();
+
+        if(!ui.razButton->isEnabled())
+        {
+            QString id = "";
+            for(int i = 7; i < data.length(); i++)
+            {
+                id += data[i];
+
+            }
+            id.replace("\r\n", "");
+            qDebug() << id;
+            ui.razButton->setEnabled(true);
+        }
+    }
+}
+
 
 void GestionParticipant::razGetData(QByteArray data)
 {
@@ -196,6 +300,8 @@ void GestionParticipant::on_razButton_clicked()
          ui.razButton->setEnabled(false);
 
 
+
+         /*
          QThread *thread = new QThread();
          Portique *portique = new Portique();
 
@@ -215,6 +321,7 @@ void GestionParticipant::on_razButton_clicked()
          qDebug() << "Recuperation de la data..";
 
          //ToDo : connect signal..
+         */
     }
 
 }

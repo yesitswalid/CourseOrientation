@@ -8,6 +8,7 @@
 #include <QByteArray>
 #include <ui_gestionparticipant.h>
 #include "databasemanager.h"
+#include <QSerialPort>
 
 class GestionParticipant : public QMainWindow
 {
@@ -31,13 +32,17 @@ private slots:
 
     void finishedRead();
 
+    void serialReceived();
+
 private:
     Ui::GestionParticipant ui;
     void showError(const QSqlError &err);
+    QSerialPort *serial;
     QSqlRelationalTableModel *model;
     DatabaseManager *m_db;
     int genreIdx;
     void createMenuBar();
+
 };
 
 

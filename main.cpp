@@ -14,7 +14,6 @@ int main(int argc, char *argv[])
     //Initialisation du serveur pour la communication du portique
     Server *server = new Server();
 
-    Portique portique;
 
     /*
     QThread *t = new QThread();
