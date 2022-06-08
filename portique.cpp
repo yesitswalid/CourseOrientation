@@ -35,7 +35,7 @@ Portique::Portique()
     {
 
 
-        connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
+        //connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
 
     } else {
         qDebug() << "Erreur lors de la lecture !" << serial->error();
@@ -57,6 +57,8 @@ void Portique::doWork()
            isRead = false;
        }
     }
+
+    serial->close();
     emit workFinished();
 }
 

@@ -179,7 +179,10 @@ void GestionParticipant::razGetData(QByteArray data)
 
 void GestionParticipant::finishedRead()
 {
-    qDebug() << "finished !!!";
+    if(!ui.razButton->isEnabled())
+    {
+        ui.razButton->setEnabled(true);
+    }
 }
 
 void GestionParticipant::on_razButton_clicked()
