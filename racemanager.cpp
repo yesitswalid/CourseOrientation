@@ -45,7 +45,7 @@ void RaceManager::setRace(int raceId, int departmentId, QString name, QString da
 }
 
 
-void RaceManager::setMode(int mode)
+void RaceManager::setMode(const int mode)
 {
     this->mode = mode;
 }

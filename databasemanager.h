@@ -175,8 +175,14 @@ public:
 
     QList<QVariant> getParticipantData(int participantId);
 
+
+    //PARTIE RFID ET DOIGT
+
     bool isPortiqueRFIDExist(int participantId);
     bool isFingerExist(int participantId);
+
+    void setPortiqueRFID(int participantId, int rfid);
+    void setFinger(int participantId, int rfid);
 
 
     //PARTIE COURSE

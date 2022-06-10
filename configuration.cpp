@@ -8,6 +8,8 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QTextStream>
+#include <QtDebug>
 
 
 class Configuration

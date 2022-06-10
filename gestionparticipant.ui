@@ -167,7 +167,7 @@
            </widget>
           </item>
           <item row="10" column="0">
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="razSimButton">
             <property name="text">
              <string>RAZ</string>
             </property>
@@ -195,7 +195,7 @@
            </widget>
           </item>
           <item row="11" column="0">
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="dataSimButton">
             <property name="text">
              <string>DATA</string>
             </property>

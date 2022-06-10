@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QUdpSocket>
+#include <racemanager.h>
 
 #define PORT 1234
 
@@ -43,8 +44,12 @@ public slots:
 
         quint16 senderPort;
 
+
+
         socket->readDatagram(buffer.data(), buffer.size(),
                              &sender, &senderPort);
+
+        /*
         qDebug() << "Client from: " << sender.toString();
         qDebug() << "Client port: " << senderPort;
         qDebug() << "Buffer: " << buffer;
@@ -52,29 +57,36 @@ public slots:
         lecteurSender = sender;
         lecteurPort = senderPort;
 
-        socket->writeDatagram(QByteArray("R"), lecteurSender, lecteurPort);
+        socket->writeDatagram(QByteArray("D"), lecteurSender, lecteurPort);
+        */
 
 
-        if(MODE == DEFAULT)
+        if(RaceManager::getInstance()->getMode() == DEFAULT)
         {
 
-            qDebug() << "Client from: " << sender.toString();
+            qDebug() << "Client from (DEFAULT): " << sender.toString();
             qDebug() << "Client port: " << senderPort;
             qDebug() << "Buffer: " << buffer;
 
             lecteurSender = sender;
             lecteurPort = senderPort;
 
-            socket->writeDatagram(QByteArray("R"), lecteurSender, lecteurPort);
-            MODE = RAZ;
-        } else if(MODE == RAZ) {
+            socket->writeDatagram(QByteArray("D"), lecteurSender, lecteurPort);
+            RaceManager::getInstance()->setMode(RAZ);
+        } else if(RaceManager::getInstance()->getMode() == RAZ) {
             if(!buffer.contains("acknowledged"))
             {
-                qDebug() << "Client from: " << sender.toString();
+                qDebug() << "Client from (RAZ): " << sender.toString();
                 qDebug() << "Client port: " << senderPort;
                 qDebug() << "Buffer: " << buffer;
             }
+        } else if(RaceManager::getInstance()->getMode() == DATA)
+        {
+            qDebug() << "Client from (DATA): " << sender.toString();
+            qDebug() << "Client port: " << senderPort;
+            qDebug() << "Buffer: " << buffer;
         }
+
 
         /*
 

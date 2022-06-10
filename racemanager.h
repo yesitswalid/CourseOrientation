@@ -13,8 +13,8 @@ class RaceManager
 
 public:
 
-    const int RAZ = 0;
-    const int DATA = 1;
+    const static int RAZ = 0;
+    const static int DATA = 1;
 
     struct Race
     {
@@ -33,7 +33,7 @@ public:
     static RaceManager *getInstance();
     RaceManager();
 
-    void setMode(int mode);
+    void setMode(const int mode);
     int getMode();
 
     bool isRaceSelected();

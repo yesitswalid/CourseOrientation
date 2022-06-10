@@ -254,6 +254,18 @@ bool DatabaseManager::isFingerExist(int participantId)
 }
 
 
+void DatabaseManager::setFinger(int participantId, int fingerId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("UPDATE participant_races SET finger=? WHERE participant_id=? and race_id=?");
+    q.addBindValue(fingerId);
+    q.addBindValue(participantId);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.exec();
+}
+
+
 
 bool DatabaseManager::isPortiqueRFIDExist(int participantId)
 {
@@ -271,6 +283,17 @@ bool DatabaseManager::isPortiqueRFIDExist(int participantId)
      recCount++;
     }
     return  (recCount > 0);
+}
+
+void DatabaseManager::setPortiqueRFID(int participantId, int rfid)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("UPDATE participant_races SET rfid=? WHERE participant_id=? and race_id=?");
+    q.addBindValue(rfid);
+    q.addBindValue(participantId);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.exec();
 }
 
 

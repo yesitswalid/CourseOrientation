@@ -2,6 +2,7 @@
 #include "ui_gestionparticipant.h"
 //#include <QThread>
 //#include <portique.h>
+#include <configuration.cpp>
 #include "racemanager.h"
 #include "databasemanager.h"
 #include <QtSql>
@@ -18,6 +19,21 @@ GestionParticipant::GestionParticipant()
 {
     m_db = new DatabaseManager();
     ui.setupUi(this);
+
+
+
+    ///////////// PARTIE SIMULATION /////////////////
+
+    this->sim_config = new Configuration("simulation.json");
+
+
+
+    //Ajout du genre directement au QComboBox du genreEdit
+    QStringList l;
+    l.append("masculin");
+    l.append("feminin");
+    l.append("Non binaire");
+    //ui.genreEdit->addItems(l);
 
 
 
@@ -64,6 +80,21 @@ GestionParticipant::GestionParticipant(DatabaseManager *db)
 {
     m_db = db;
     ui.setupUi(this);
+
+    ///////////// PARTIE SIMULATION /////////////////
+
+    this->sim_config = new Configuration("simulation.json");
+
+
+    ////////////////////////////////////////
+
+
+    //Ajout du genre directement au QComboBox du genreEdit
+    QStringList l;
+    l.append("masculin");
+    l.append("feminin");
+    l.append("Non binaire");
+    //ui.genreEdit->addItems(l);
 
     // GESTION PORTIQUE //
 
@@ -120,7 +151,9 @@ void GestionParticipant::createTableView()
 
     model = new QSqlQueryModel();
 
-    model->setQuery("SELECT p.id, p.lastname, p.firstname, p.mail, p.password, p.year, g.sexe, p.rfid FROM "
+
+
+    model->setQuery("SELECT p.id, p.lastname, p.firstname, p.mail, p.password, p.year, g.sexe FROM "
                     "participants as p, genders as g, participant_races as pr"
                     " WHERE p.genre_id=g.id and p.id=pr.participant_id and pr.race_id="+QString::number(RaceManager::getInstance()->getRaceId()));
 
@@ -131,8 +164,6 @@ void GestionParticipant::createTableView()
     model->setHeaderData(4, Qt::Horizontal, tr("Mot de Passe"));
     model->setHeaderData(5, Qt::Horizontal, tr("Date de Naissance"));
     model->setHeaderData(6, Qt::Horizontal, tr("Genre"));
-    model->setHeaderData(7, Qt::Horizontal, tr("RFID"));
-
 
 
     /*
@@ -217,14 +248,15 @@ void GestionParticipant::createTableView()
     //Appliquer le model QSqlRelationTableModel
     mapper->setModel(ui.participantTable->model());
 
+
     mapper->setItemDelegate(new QSqlRelationalDelegate(this));
     //Element necessaire du mappage pour l'édition du model de vue fournis à l'organisateur
     mapper->addMapping(ui.nomEdit, 1);
     mapper->addMapping(ui.prenomEdit, 2);
     mapper->addMapping(ui.mailEdit, 3);
-    mapper->addMapping(ui.genreEdit, genreIdx);
+    mapper->addMapping(ui.genreEdit, 6);
     mapper->addMapping(ui.dateEdit, 5);
-    mapper->addMapping(ui.rfidEdit, 7);
+    //mapper->addMapping(ui.rfidEdit, 7);
 
     //Appliquer un signal lorsqu'une valeur à été changer dans le model du tableau
     connect(ui.participantTable->selectionModel(),
@@ -286,8 +318,7 @@ void GestionParticipant::on_updateButton_clicked()
                   "mail=:mail,"
                   "password=:password,"
                   "year=:year,"
-                  "genre_id=:genre_id,"
-                  "rfid=:rfid"
+                  "genre_id=:genre_id"
                   " WHERE id=:id");
         //récupérer toutes les valeur du model du tableau de chaque colonne
         q.bindValue(":id", selectedIndexes[0].data().value<int>());
@@ -399,4 +430,29 @@ void GestionParticipant::on_razButton_clicked()
     }
 
 }
+
+
+/////////////////////// PARTIE SIMULATION ////////////////////////////////////////////
+
+void GestionParticipant::on_razSimButton_clicked()
+{
+     RaceManager::getInstance()->setMode(RaceManager::RAZ);
+
+     QJsonObject obj = this->sim_config->getAll();
+
+     QJsonValueRef m_values = obj.find(QString::number(this->participantSimId++)).value();
+     //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+     QJsonObject m_obj_values = m_values.toObject();
+
+    // m_db->setFinger(m_obj_values.find())
+
+
+}
+
+
+void GestionParticipant::on_dataSimButton_clicked()
+{
+    RaceManager::getInstance()->setMode(RaceManager::DATA);
+}
+
 
