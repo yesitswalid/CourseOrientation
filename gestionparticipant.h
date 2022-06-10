@@ -38,7 +38,8 @@ private:
     Ui::GestionParticipant ui;
     void showError(const QSqlError &err);
     QSerialPort *serial;
-    QSqlRelationalTableModel *model;
+    //QSqlRelationalTableModel *model;
+    QSqlQueryModel *model;
     DatabaseManager *m_db;
     int genreIdx;
     void createMenuBar();

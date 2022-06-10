@@ -44,6 +44,17 @@ void RaceManager::setRace(int raceId, int departmentId, QString name, QString da
     this->book = book;
 }
 
+
+void RaceManager::setMode(int mode)
+{
+    this->mode = mode;
+}
+
+int RaceManager::getMode()
+{
+    return this->mode;
+}
+
 QString RaceManager::getName()
 {
     return this->name;

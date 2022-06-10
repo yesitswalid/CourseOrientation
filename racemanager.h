@@ -13,6 +13,9 @@ class RaceManager
 
 public:
 
+    const int RAZ = 0;
+    const int DATA = 1;
+
     struct Race
     {
             QString name;
@@ -30,9 +33,11 @@ public:
     static RaceManager *getInstance();
     RaceManager();
 
+    void setMode(int mode);
+    int getMode();
+
     bool isRaceSelected();
     void setRaceSelected(bool isSelected);
-
     QVector<Race> getRaces();
     void setRaces(QVector<Race> races);
     void setRace(int raceId,
@@ -82,6 +87,7 @@ protected:
 
 private:
     bool raceSelected = false;
+    int mode = RAZ; //par defaut le mode est à RAZ
     QVector<Race> races;
     QString name;
     int raceId;

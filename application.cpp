@@ -238,12 +238,6 @@ void Application::on_buttonSelectRace_clicked()
                                                 race.difficulty, race.type, race.book);
             QMessageBox::information(this, "Course", "Vous avez selectionner la course: " + race.name);
 
-            if(m_mydb->importData()){
-                QMessageBox::information(this, "Importation", "Importation avec succès des données du site web !");
-            } else {
-                QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
-            }
-
 
             //action fichier
             for(QAction *ac : ui->menuParam_tre->actions())

@@ -19,7 +19,7 @@ public:
 
 MySQLData()
 {    
-
+    //Utilisation des informations de la base de données par défaut si on instance la classe sans paramètre
     QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myMysql");
 
     m_dbCopy.setHostName("127.0.0.1");
@@ -50,7 +50,7 @@ MySQLData(QString username, QString password, QString hostname, QString dbName)
         qDebug() << "Erreur lors de la connexion du serveur : " << m_dbCopy.lastError();
     }
 
-    m_db = new QSqlDatabase(m_dbCopy); // initialise le pointer avec un nouveau objet d'une copie de QSqlDatabase
+    m_db = new QSqlDatabase(m_dbCopy); // instance de QSqlDatabase depuis un nouveau objet d'une copie de QSqlDatabase
     m_dbCopy.close();
 
     if(m_db->open())

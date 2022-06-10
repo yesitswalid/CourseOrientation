@@ -144,6 +144,9 @@ bool DatabaseManager::isParticipantRaceExist(int participantId)
      return  (recCount > 0);
 }
 
+
+
+//Ajouter un participant dans la table participants
 void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname,
                                      const QString &mail,
                                      const QString &password,
@@ -161,11 +164,28 @@ void DatabaseManager::addParticipant(const QString &lastname, const QString &fir
     q.addBindValue(genreId);
     q.exec();
 
-    int participant_id = q.lastInsertId().toInt();
-    int race_id = RaceManager::getInstance()->getRaceId();
-    qDebug() << participant_id << race_id;
+}
 
-    //this->addParticipantRace(participant_id, race_id);
+//Ajouter un participant dans la table participant et récupérer l'id du participant pour l'insérer dans participant_race
+void DatabaseManager::addParticipantRace(const QString &lastname, const QString &firstname,
+                                          const QString &mail,
+                                          const QString &password,
+                                          const QString &year,
+                                          int genreId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare(INSERT_PARTICIPANT_SQL);
+    q.addBindValue(lastname);
+    q.addBindValue(firstname);
+    q.addBindValue(mail);
+    q.addBindValue(password);
+    q.addBindValue(year);
+    q.addBindValue(genreId);
+    q.exec();
+
+    this->addParticipantRace(q.lastInsertId().toInt(), RaceManager::getInstance()->getRaceId());
+
 }
 
 /*

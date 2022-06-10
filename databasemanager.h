@@ -147,7 +147,14 @@ public:
     void removeParticipant(const int id);
 
 
+    void addParticipantRace(const QString &lastname, const QString &firstname,
+                                              const QString &mail,
+                                              const QString &password,
+                                              const QString &year,
+                                              int genreId);
     void addParticipantRace(int participantId, int raceId);
+
+
     bool isParticipantRaceExist(int participantId);
 
 
