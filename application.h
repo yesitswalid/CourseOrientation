@@ -53,6 +53,8 @@ private slots:
 
     void on_actionPortique_triggered();
 
+    void on_actionQuitter_2_triggered();
+
 private:
     Ui::Application *ui;
     RaceManager *race;

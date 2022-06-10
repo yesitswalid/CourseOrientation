@@ -271,3 +271,9 @@ void Application::on_actionPortique_triggered()
     }
 }
 
+
+void Application::on_actionQuitter_2_triggered()
+{
+    this->close();
+}
+

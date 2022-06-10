@@ -59,6 +59,9 @@ QSqlError DatabaseManager::initDb()
         return q.lastError();
     if (!q.exec(ARRIVALS_SQL))
         return q.lastError();
+    if(!q.exec(PARTICIPANTS_RACES_DATA_SQL))
+       return q.lastError();
+
 
     insertGenreIfNotExist(QString("masculin"));
     insertGenreIfNotExist(QString("feminin"));
@@ -85,7 +88,6 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
         return QSqlError();
 
     QSqlQuery q;
-    q = m_db.exec();
     if (!q.exec(PARTICIPANTS_SQL))
         return q.lastError();
     if (!q.exec(GENDERS_SQL))
@@ -98,6 +100,9 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
         return q.lastError();
     if (!q.exec(ARRIVALS_SQL))
         return q.lastError();
+    if(!q.exec(PARTICIPANTS_RACES_DATA_SQL))
+       return q.lastError();
+
 
     insertGenreIfNotExist(QString("masculin"));
     insertGenreIfNotExist(QString("feminin"));
@@ -212,6 +217,63 @@ void DatabaseManager::addParticipantRace(int participantId, int raceId)
 
 }
 
+QList<QVariant> DatabaseManager::getParticipantData(int participantId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("SELECT * FROM participants as p, participant_races as pr, participant_races_data as prc WHERE p.id=pr.participant_id=prc.participant_id=?");
+    q.addBindValue(participantId);
+    q.exec();
+
+    QList<QVariant> data;
+    int i = 0;
+    while(q.next())
+    {
+        data.append(q.value(i));
+        i++;
+    }
+    return data;
+}
+
+bool DatabaseManager::isFingerExist(int participantId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("SELECT * FROM participant_races WHERE participant_id=? and finger IS NOT NULL");
+    q.addBindValue(participantId);
+    if(q.exec())
+    {
+       return q.next();
+    }
+    int recCount = 0;
+    while(q.next())
+    {
+     recCount++;
+    }
+    return  (recCount > 0);
+}
+
+
+
+bool DatabaseManager::isPortiqueRFIDExist(int participantId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("SELECT * FROM participant_races WHERE participant_id=? and rfid IS NOT NULL");
+    q.addBindValue(participantId);
+    if(q.exec())
+    {
+       return q.next();
+    }
+    int recCount = 0;
+    while(q.next())
+    {
+     recCount++;
+    }
+    return  (recCount > 0);
+}
+
+
 void DatabaseManager::insertGenreIfNotExist(const QString &sexe)
 {
     QSqlQuery q;
@@ -237,6 +299,10 @@ void DatabaseManager::removeParticipant(const int id)
     q.exec();
 
     q.prepare(DELETE_PARTICIPANT_RACE_SQL);
+    q.addBindValue(id);
+    q.exec();
+
+    q.prepare(DELETE_PARTICIPANT_RACE_DATA_SQL);
     q.addBindValue(id);
     q.exec();
 

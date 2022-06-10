@@ -38,20 +38,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>MODE: INIT</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="text">
-       <string>INIT</string>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QLabel" name="label_3">
       <property name="text">
        <string>MODE: DATA</string>

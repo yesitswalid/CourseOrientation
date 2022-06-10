@@ -16,8 +16,7 @@ const auto PARTICIPANTS_SQL = QString(R"(
     mail varchar,
     password varchar,
     year varchar,
-    genre_id integer,
-    rfid integer DEFAULT 0)
+    genre_id integer)
     )");
 
 const auto PARTICIPANTS_RACES_SQL = QString(R"(
@@ -25,7 +24,18 @@ const auto PARTICIPANTS_RACES_SQL = QString(R"(
     id integer primary key,
     participant_id integer,
     race_id integer,
-    finger integer DEFAULT NULL)
+    finger integer DEFAULT NULL,
+    rfid integer DEFAULT NULL)
+    )");
+
+const auto PARTICIPANTS_RACES_DATA_SQL = QString(R"(
+    create table if not exists participant_races_data(
+    id integer primary key,
+    participant_id integer,
+    race_id integer,
+    beacons integer DEFAULT NULL,
+    points integer DEFAULT 0,
+    race_duration integer DEFAULT 0)
     )");
 
 const auto GENDERS_SQL = QString(R"(
@@ -67,6 +77,7 @@ const auto ARRIVALS_SQL = QString(R"(
 
 
 
+
 //////////////////// REQUETE INSERTION /////////////////
 const auto INSERT_PARTICIPANT_SQL = QString(R"(
     insert into participants(lastname, firstname, mail, password, year, genre_id)
@@ -98,6 +109,11 @@ const auto DELETE_PARTICIPANT_SQL = QString(R"(
 const auto DELETE_PARTICIPANT_RACE_SQL = QString(R"(
     delete from participant_races where participant_id = ?
     )");
+
+
+const auto DELETE_PARTICIPANT_RACE_DATA_SQL = QString(R"(
+    delete from participant_races_data where participant_id = ?
+")");
 
 const auto DELETE_GENDER_SQL = QString(R"(
     delete from genders where id = ?
@@ -156,6 +172,11 @@ public:
 
 
     bool isParticipantRaceExist(int participantId);
+
+    QList<QVariant> getParticipantData(int participantId);
+
+    bool isPortiqueRFIDExist(int participantId);
+    bool isFingerExist(int participantId);
 
 
     //PARTIE COURSE

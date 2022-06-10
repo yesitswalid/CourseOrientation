@@ -133,6 +133,8 @@ void GestionParticipant::createTableView()
     model->setHeaderData(6, Qt::Horizontal, tr("Genre"));
     model->setHeaderData(7, Qt::Horizontal, tr("RFID"));
 
+
+
     /*
 
     model = new QSqlRelationalTableModel(ui.participantTable);
@@ -234,6 +236,9 @@ void GestionParticipant::createTableView()
     //definir la selection de l'index par default de la ligne et de la colonne donc ligne 0 et colonne 0
     ui.participantTable->setCurrentIndex(model->index(0, 0));
 
+
+    qDebug() << m_db->getParticipantData(5);
+
 }
 
 void GestionParticipant::createMenuBar()
@@ -266,6 +271,8 @@ void GestionParticipant::on_suprButton_clicked()
 void GestionParticipant::on_updateButton_clicked()
 {
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+
+    qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
 
 
     if(!selectedIndexes.isEmpty())
