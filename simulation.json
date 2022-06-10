@@ -1,0 +1,106 @@
+{
+    "1": {
+        "finger_id": 24021505178,
+        "passage_id": 26999,
+        "passage_start": 1654835437,
+        "passage_end": 1654838077,
+        "data": {
+            "1": {
+                "altitude": 3884.455,
+                "longitude": 1884.455,
+                "order_id": 1,
+                "points": 2
+            },
+            "2": {
+                "altitude": 4884.455,
+                "longitude": 2884.455,
+                "order_id": 2,
+                "points": 3
+            },
+            "3": {
+                "altitude": 131.55,
+                "longitude": 182.455,
+                "order_id": 3,
+                "points": 5
+            }
+        }
+    },
+    "2": {
+        "finger_id": 23338344551,
+        "passage_id": 23415,
+        "passage_start": 1654835437,
+        "passage_end": 1654838917,
+        "data": {
+            "1": {
+                "altitude": 3884.455,
+                "longitude": 1884.455,
+                "order_id": 1,
+                "points": 3
+            },
+            "2": {
+                "altitude": 4884.455,
+                "longitude": 2884.455,
+                "order_id": 2,
+                "points": 6
+            },
+            "3": {
+                "altitude": 131.55,
+                "longitude": 182.455,
+                "order_id": 3,
+                "points": 6
+            }
+        }
+    },
+    "3": {
+        "finger_id": 29451041105,
+        "passage_id": 17758,
+        "passage_start": 1654835437,
+        "passage_end": 1654839037,
+        "data": {
+            "1": {
+                "altitude": 3884.455,
+                "longitude": 1884.455,
+                "order_id": 1,
+                "points": 3
+            },
+            "2": {
+                "altitude": 4884.455,
+                "longitude": 2884.455,
+                "order_id": 2,
+                "points": 4
+            },
+            "3": {
+                "altitude": 131.55,
+                "longitude": 182.455,
+                "order_id": 3,
+                "points": 4
+            }
+        }
+    },
+    "4": {
+        "finger_id": 29828364159,
+        "passage_id": 78155,
+        "passage_start": 1654835437,
+        "passage_end": 1654838017,
+        "data": {
+            "1": {
+                "altitude": 3884.455,
+                "longitude": 1884.455,
+                "order_id": 1,
+                "points": 1
+            },
+            "2": {
+                "altitude": 4884.455,
+                "longitude": 2884.455,
+                "order_id": 2,
+                "points": 7
+            },
+            "3": {
+                "altitude": 131.55,
+                "longitude": 182.455,
+                "order_id": 3,
+                "points": 5
+            }
+        }
+    }
+}
