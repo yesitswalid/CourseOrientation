@@ -18,7 +18,8 @@ public:
     QJsonObject *m_data;
 
 MySQLData()
-{    
+{
+    /*
     //Utilisation des informations de la base de données par défaut si on instance la classe sans paramètre
     QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myMysql");
 
@@ -34,38 +35,27 @@ MySQLData()
 
     m_db = new QSqlDatabase(m_dbCopy); // initialise le pointer avec un nouveau objet d'une copie de QSqlDatabase
     qDebug() << m_db->open();
+    */
 }
 
 MySQLData(QString username, QString password, QString hostname, QString dbName)
 {
-    QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myMysql");
+    //QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myMysql");
 
-    m_dbCopy.setUserName(username);
-    m_dbCopy.setPassword(password);
-    m_dbCopy.setHostName(hostname);
-    m_dbCopy.setDatabaseName(dbName);
+    m_db = new QSqlDatabase(QSqlDatabase::addDatabase("QMYSQL", "myTestSQL"));//QSqlDatabase::addDatabase("QMYSQL", "myMysql");
 
-    if (!m_dbCopy.open())
-    {
-        qDebug() << "Erreur lors de la connexion du serveur : " << m_dbCopy.lastError();
-    }
+    m_db->setUserName(username);
+    m_db->setPassword(password);
+    m_db->setHostName(hostname);
+    m_db->setDatabaseName(dbName);
 
-    m_db = new QSqlDatabase(m_dbCopy); // instance de QSqlDatabase depuis un nouveau objet d'une copie de QSqlDatabase
-    m_dbCopy.close();
 
-    if(m_db->open())
-    {
-        qDebug() << "Le serveur communique avec la base de données.";
-    } else {
-        qWarning() << "Le serveur ne communique pas avec la base de données !";
-    }
-
-    //Constructeur
 }
 
 ~MySQLData()
 {
     //Destructeur
+    m_db->close();
     delete m_db;
 }
 
@@ -87,34 +77,23 @@ int getConvertFormatSexe(QString sexe)
     }
     return 3;
 }
-/*
-const auto PARTICIPANTS_SQL = QString(R"(
-    create table if not exists participants(id integer primary key, lastname varchar, firstname varchar, mail varchar, password varchar, year varchar,
-                       genre_id integer, rfid integer DEFAULT 0)
-    )");
-
-const auto GENDERS_SQL = QString(R"(
-    create table if not exists genders(id integer primary key, sexe varchar)
-    )");
-
-
-const auto RACES_SQL = QString(R"(
-    create table if not exists races(id integer primary key, name varchar, datetime vachar, description varchar)
-    )");
-
-const auto CHECKPOINTS_SQL = QString(R"(
-    create table if not exists checkpoints(id integer primary key, altitude varchar, longitude vachar, attitude varchar, race_id integer, order_id varchar, points integer)
-)");
-
-
-const auto ARRIVALS_SQL = QString(R"(
-    create table if not exists checkpoints(id integer primary key, participant_id integer, checkpoint_id integer, datetime varchar)
-)");
-
-*/
 
 bool importData()
 {
+
+    if (!m_db->open())
+    {
+        qDebug() << "Erreur lors de la connexion du serveur : " << m_db->lastError();
+    }
+
+    if(m_db->open())
+    {
+        qDebug() << "Le serveur communique avec la base de données.";
+    } else {
+        qWarning() << "Le serveur ne communique pas avec la base de données !";
+    }
+
+    //Constructeur
 
    QString connectionName;
    QSqlQuery query;
@@ -125,8 +104,11 @@ bool importData()
    {
        return false;
    }
-     DatabaseManager m_db_saver = DatabaseManager();
-     QSqlError err = m_db_saver.initDb(connectionName);
+     DatabaseManager *m_db_saver = new DatabaseManager();
+     if(m_db_saver->getDb().connectionNames().contains("myNewDb")){
+         m_db_saver->getDb().removeDatabase(connectionName);
+     }
+     QSqlError err = m_db_saver->initDb(connectionName);
 
      while(query.next())
      {
@@ -137,15 +119,18 @@ bool importData()
              QString year = query.value(4).toString();
              int genderId = getConvertFormatSexe(query.value(5).toString());
 
-             qDebug() << email << password << firstname << lastname << year << genderId;
+                             // qDebug() << email << password << firstname << lastname << year << genderId;
 
-             if(!m_db_saver.isParticipantExist(email))
+             //qDebug() << m_db_saver->isParticipantExist(email);
+
+
+             if(!m_db_saver->isParticipantExist(email))
              {
-                 m_db_saver.addParticipant(lastname, firstname, email, password, year, genderId); //Ajouter un participant
+                 m_db_saver->addParticipant(lastname, firstname, email, password, year, genderId); //Ajouter un participant
              }
     }
 
-     query.prepare(QString("SELECT id, id_department, name, date, location FROM races"));
+     query.prepare(QString("SELECT * FROM races"));
 
      if (!query.exec())
      {
@@ -154,19 +139,23 @@ bool importData()
 
      while(query.next())
      {
+
          int race_id = query.value(0).toInt();
          int id_department = query.value(1).toInt();
          QString raceName = query.value(2).toString();
-         QString date = query.value(3).toString();
+         QDateTime date = QDateTime::fromString(query.value(3).toString(), Qt::ISODate);
          QString location = query.value(4).toString();
+         QString gps_longitude = query.value(5).toString();
+         QString gps_latitude = query.value(6).toString();
+         int difficulty = query.value(7).toInt();
+         int type = query.value(8).toInt();
+         int book = query.value(9).toInt();
 
-         qDebug() << race_id << id_department << raceName << date << location;
 
-         //Application
-
-         if(!m_db_saver.isRaceExist(raceName))
+         if(!m_db_saver->isRaceExist(raceName))
          {
-             m_db_saver.addRace(race_id, id_department, raceName, location, date, "N/A");   //Ajouter une course
+             m_db_saver->addRace(race_id, id_department, raceName, date, location,
+                                 gps_longitude, gps_latitude, difficulty, type, book);
          }
      }
 
@@ -185,19 +174,20 @@ bool importData()
          int race_id = query.value(1).toInt();
 
 
-         qDebug() << participant_id << race_id;
+        // qDebug() << participant_id << race_id;
 
          //Application
 
-         if(!m_db_saver.isParticipantRaceExist(participant_id))
+         if(!m_db_saver->isParticipantRaceExist(participant_id))
          {
-             m_db_saver.addParticipantRace(participant_id, race_id);  //Ajouter les participants sur chaque course
+             qDebug() << "add 3";
+             m_db_saver->addParticipantRace(participant_id, race_id);  //Ajouter les participants sur chaque course
          }
      }
 
      //ToDo : finish
-    m_db_saver.getDb().removeDatabase(connectionName);
-    m_db_saver.getDb().close();
+    //m_db_saver->getDb().removeDatabase(connectionName);
+    //m_db_saver->getDb().close();
 
     return true;
 }

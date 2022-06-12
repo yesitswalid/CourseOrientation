@@ -6,20 +6,20 @@
         "passage_end": 1654838077,
         "data": {
             "1": {
-                "altitude": 3884.455,
-                "longitude": 1884.455,
+                "longitude": 3884.455,
+                "latitude": 1884.455,
                 "order_id": 1,
                 "points": 2
             },
             "2": {
-                "altitude": 4884.455,
-                "longitude": 2884.455,
-                "order_id": 2,
+                "longitude": 4884.455,
+                "latitude": 2884.455,
+                "order": 2,
                 "points": 3
             },
             "3": {
-                "altitude": 131.55,
-                "longitude": 182.455,
+                "longitude": 131.55,
+                "latitude": 182.455,
                 "order_id": 3,
                 "points": 5
             }
@@ -32,20 +32,20 @@
         "passage_end": 1654838917,
         "data": {
             "1": {
-                "altitude": 3884.455,
-                "longitude": 1884.455,
+                "longitude": 3884.455,
+                "latitude": 1884.455,
                 "order_id": 1,
                 "points": 3
             },
             "2": {
-                "altitude": 4884.455,
-                "longitude": 2884.455,
+                "longitude": 4884.455,
+                "latitude": 2884.455,
                 "order_id": 2,
                 "points": 6
             },
             "3": {
-                "altitude": 131.55,
-                "longitude": 182.455,
+                "longitude": 131.55,
+                "latitude": 182.455,
                 "order_id": 3,
                 "points": 6
             }
@@ -58,20 +58,20 @@
         "passage_end": 1654839037,
         "data": {
             "1": {
-                "altitude": 3884.455,
-                "longitude": 1884.455,
+                "longitude": 3884.455,
+                "latitude": 1884.455,
                 "order_id": 1,
                 "points": 3
             },
             "2": {
-                "altitude": 4884.455,
-                "longitude": 2884.455,
+                "longitude": 4884.455,
+                "latitude": 2884.455,
                 "order_id": 2,
                 "points": 4
             },
             "3": {
-                "altitude": 131.55,
-                "longitude": 182.455,
+                "longitude": 131.55,
+                "latitude": 182.455,
                 "order_id": 3,
                 "points": 4
             }
@@ -84,20 +84,20 @@
         "passage_end": 1654838017,
         "data": {
             "1": {
-                "altitude": 3884.455,
-                "longitude": 1884.455,
+                "longitude": 3884.455,
+                "latitude": 1884.455,
                 "order_id": 1,
                 "points": 1
             },
             "2": {
-                "altitude": 4884.455,
-                "longitude": 2884.455,
+                "longitude": 4884.455,
+                "latitude": 2884.455,
                 "order_id": 2,
                 "points": 7
             },
             "3": {
-                "altitude": 131.55,
-                "longitude": 182.455,
+                "longitude": 131.55,
+                "latitude": 182.455,
                 "order_id": 3,
                 "points": 5
             }

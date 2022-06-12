@@ -43,17 +43,15 @@ private slots:
 
     void on_actionBddConfig_triggered();
 
-    void on_actionExporter_vers_triggered();
-
     void on_actionImporter_triggered();
 
-
     void on_buttonSelectRace_clicked();
-
 
     void on_actionPortique_triggered();
 
     void on_actionQuitter_2_triggered();
+
+    void on_actionExporter_triggered();
 
 private:
     Ui::Application *ui;

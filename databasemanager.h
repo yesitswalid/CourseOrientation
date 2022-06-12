@@ -44,16 +44,20 @@ const auto GENDERS_SQL = QString(R"(
     sexe varchar)
     )");
 
-
 const auto RACES_SQL = QString(R"(
-    create table if not exists races(
-    id integer primary key,
-    id_department integer,
-    name varchar,
-    location varchar,
-    date datetime,
-    description varchar)
-    )");
+  create table if not exists races(
+      id integer primary key,
+      id_department integer,
+      name varchar,
+      date datetime DEFAULT NULL,
+      location varchar DEFAULT NULL,
+      gps_longitude varchar,
+      gps_latitude varchar,
+      difficulty integer,
+      type integer,
+      book integer)
+)");
+
 
 const auto CHECKPOINTS_SQL = QString(R"(
     create table if not exists checkpoints(
@@ -93,11 +97,9 @@ const auto INSERT_GENDER_SQL = QString(R"(
     INSERT OR REPLACE INTO genders (sexe) values(?);
 )");
 
-
 const auto INSERT_RACE_SQL = QString(R"(
-    INSERT INTO races(id_department, name, location, date, description) values(?, ?, ?, ?, ?)
+   INSERT INTO races (id, id_department, name, date, location, gps_longitude, gps_latitude, difficulty, type, book) values(?,?,?,?,?,?,?,?,?,?)
 )");
-
 
 ////////////////////////// REQUETE POUR SUPPRIMER UNE LIGNE //////////////////////////////////
 
@@ -146,14 +148,13 @@ const auto SELECT_DATA_RACE = QString(R"(SELECT * FROM races WHERE name=?)");
 class DatabaseManager
 {
 private:
-    QFileInfo *fileInfo;
     QSqlDatabase m_db;
 public:
     ~DatabaseManager();
     //Ouvrir la base de données et effectuer les enregistrement sur course.db
     DatabaseManager();
     //Ouvrir la base de données du fichier dans depuis le nom du constructeur et enregistrer son contenue
-    DatabaseManager(QString filePath);
+    //DatabaseManager(QString filePath);
 
     //PARTIE PARTICIPANT
     void addParticipant(const QString &lastname, const QString &firstname, const QString &mail, const QString &password, const QString &year, int genreId);
@@ -176,17 +177,20 @@ public:
     QList<QVariant> getParticipantData(int participantId);
 
 
-    //PARTIE RFID ET DOIGT
+    //PARTIE DOSSAR PASSAGE ET DOIGT(RFID)
 
-    bool isPortiqueRFIDExist(int participantId);
+    bool isPortiqueBIDExist(int participantId);
     bool isFingerExist(int participantId);
 
-    void setPortiqueRFID(int participantId, int rfid);
-    void setFinger(int participantId, int rfid);
+    void setPortiqueBID(int participantId, qlonglong bid);
+    void setFinger(int participantId, qlonglong fingerId);
 
 
     //PARTIE COURSE
-    void addRace(int race_id, int id_department, const QString name, const QString location, const QString date, const QString description);
+    //void addRace(int race_id, int id_department, const QString name, const QString location, QDateTime date);
+    void addRace(int race_id, int id_department, QString name, QDateTime date, QString location,
+                  QString gps_longitude, QString gps_latitude, int difficulty, int type, int book);
+
     bool isRaceExist(const QString &raceName);
 
     //Copy base de données

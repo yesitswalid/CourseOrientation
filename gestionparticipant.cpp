@@ -22,22 +22,24 @@ GestionParticipant::GestionParticipant()
 
 
 
+    //// CREATION DU MENU QUITTER ////
+    ///
+    this->createMenuBar();
+
+    ////////////////////////////////
+
+
     ///////////// PARTIE SIMULATION /////////////////
+    ///
+
 
     this->sim_config = new Configuration("simulation.json");
 
-
-
-    //Ajout du genre directement au QComboBox du genreEdit
-    QStringList l;
-    l.append("masculin");
-    l.append("feminin");
-    l.append("Non binaire");
-    //ui.genreEdit->addItems(l);
+    //////////////////////////////////////////////////////
 
 
 
-    // GESTION PORTIQUE //
+    ///////////////// GESTION PORTIQUE //////////////////
 
 
     serial = new QSerialPort();
@@ -81,6 +83,10 @@ GestionParticipant::GestionParticipant(DatabaseManager *db)
     m_db = db;
     ui.setupUi(this);
 
+    //// CREATION DU MENU QUITTER ////
+    ///
+    this->createMenuBar();
+
     ///////////// PARTIE SIMULATION /////////////////
 
     this->sim_config = new Configuration("simulation.json");
@@ -89,14 +95,8 @@ GestionParticipant::GestionParticipant(DatabaseManager *db)
     ////////////////////////////////////////
 
 
-    //Ajout du genre directement au QComboBox du genreEdit
-    QStringList l;
-    l.append("masculin");
-    l.append("feminin");
-    l.append("Non binaire");
-    //ui.genreEdit->addItems(l);
 
-    // GESTION PORTIQUE //
+    ////////// GESTION PORTIQUE /////////////////////
 
 
     serial = new QSerialPort();
@@ -130,117 +130,81 @@ GestionParticipant::GestionParticipant(DatabaseManager *db)
         //connect(serial, SIGNAL(readyRead()), this, SLOT(serialReceived()));
 
     } else {
-        qDebug() << "Erreur lors de la lecture !" << serial->error();
+        qDebug() << "(Erreur lors de la lecture) Erreur Précise: " << serial->error();
     }
-
-
-}
-
-
-void GestionParticipant::init()
-{
-    this->createTableView();
-    createMenuBar();
 }
 
 
 void GestionParticipant::createTableView()
 {
+
+
     // Creation du model
-
-
-    model = new QSqlQueryModel();
-
-
-
-    model->setQuery("SELECT p.id, p.lastname, p.firstname, p.mail, p.password, p.year, g.sexe FROM "
-                    "participants as p, genders as g, participant_races as pr"
-                    " WHERE p.genre_id=g.id and p.id=pr.participant_id and pr.race_id="+QString::number(RaceManager::getInstance()->getRaceId()));
-
-    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Horizontal, tr("Nom"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Prénom"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Mail"));
-    model->setHeaderData(4, Qt::Horizontal, tr("Mot de Passe"));
-    model->setHeaderData(5, Qt::Horizontal, tr("Date de Naissance"));
-    model->setHeaderData(6, Qt::Horizontal, tr("Genre"));
-
-
-    /*
-
     model = new QSqlRelationalTableModel(ui.participantTable);
-
-
-
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable("participants");
-    model->setFilter(QString("participants.id=participant_races.participant_id and participant_races.race_id=%1").arg(RaceManager::getInstance()->getRaceId()));
 
 
+    QSqlQuery q = m_db->getDb().exec();
+    q.prepare("SELECT p.id FROM "
+                        "participants as p, participant_races as pr"
+                        " WHERE p.id=pr.participant_id and pr.race_id="+QString::number(RaceManager::getInstance()->getRaceId()));
 
+    if (q.exec())
+    {
+        QString ids = "(";
+        while(q.next())
+        {
+            ids += q.value(0).toString() + ",";
+        }
+
+        //permet de récupérer la derniere chaine de caractere , pour la remplacer en )
+        //pour refermer la requete sql executer un statement  et recuperer les ids des participants de la course
+
+        //Sortie du resultat
+        // qDebug() << ids;
+
+        //Exemple: apres que la boucle est finit le resultat : (1,5,
+        //Après l'avoir traiter (1,5) en referme le statement sinon cela declanche une erreur de la requete.
+        ids = ids.left(ids.lastIndexOf(',')).append(")");
+
+       //Sortie du resultat final
+       // qDebug() << ids;
+
+        //Execution de la requete du statement.
+        model->setFilter("participants.id in " + ids);
+    }
 
     genreIdx = model->fieldIndex("genre_id");
-
     model->setRelation(genreIdx, QSqlRelation("genders", "id", "sexe"));
-    model->setRelation(1, QSqlRelation("participants", "id", "lastname"));
-    model->setRelation(2, QSqlRelation("participants", "id", "firstname"));
-    model->setRelation(3, QSqlRelation("participants", "id", "mail"));
-    model->setRelation(4, QSqlRelation("participants", "id", "password"));
-    model->setRelation(5, QSqlRelation("participants", "id", "year"));
-    model->setRelation(7, QSqlRelation("participants", "id", "rfid"));
-
-
-
-    //SELECT p.id, p.lastname, p.firstname, p.mail, p.password, p.year FROM participants as p, participant_races as prace WHERE prace.race_id=?
-
 
     //Specifier les colonnes des particpant necessaire pour l'organisateur pour la modification.
-
-
     model->setHeaderData(model->fieldIndex("lastname"), Qt::Horizontal, tr("Nom"));
     model->setHeaderData(model->fieldIndex("firstname"), Qt::Horizontal, tr("Prénom"));
     model->setHeaderData(model->fieldIndex("mail"), Qt::Horizontal, tr("Mail"));
     model->setHeaderData(model->fieldIndex("password"), Qt::Horizontal, tr("Mot de Passe"));
     model->setHeaderData(model->fieldIndex("year"), Qt::Horizontal, tr("Date de Naissance"));
     model->setHeaderData(genreIdx, Qt::Horizontal, tr("Genre"));
-    model->setHeaderData(model->fieldIndex("rfid"), Qt::Horizontal, tr("RFID"));
-    */
-
-    if(model->lastError().isValid())
-    {
-        showError(model->lastError());
-        return;
-    }
 
     //en cas d'erreur si la colonne de la table participant n'existe pas cela retournera un MessageBox d'erreur sql detailler
-   /*
     if (!model->select()) {
         showError(model->lastError());
         return;
     }
-    */
 
     //Appliquer le model de la vue du tableau
     ui.participantTable->setModel(model);
     //Appliquer
     ui.participantTable->setItemDelegate(new QSqlRelationalDelegate(ui.participantTable));
     //Cacher la colonne id dans le model du tableau
-
-    //ui.participantTable->setColumnHidden(model->fieldIndex("id"), true);
-    ui.participantTable->setColumnHidden(0, true);
-
+    ui.participantTable->setColumnHidden(model->fieldIndex("id"), true);
     //Activer la selection du model pour permettre la selection des items
     ui.participantTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    //ui.participantTable->setModel(model->relationModel(model->fieldIndex("id")));
-    //ui.participantTable->setModelColumn(model->relationModel(genreIdx)->fieldIndex("sexe"));
-
-
     //la relation de la table participants avec le genre_id determine grace a l'id le sexe du participant.
     //et s'appliquera sur le model et ainsi que sur la colonne du Genre du participant
-
-    //ui.genreEdit->setModel(model->relationModel(genreIdx));
-    //ui.genreEdit->setModelColumn(model->relationModel(genreIdx)->fieldIndex("sexe"));
+    ui.genreEdit->setModel(model->relationModel(genreIdx));
+    ui.genreEdit->setModelColumn(model->relationModel(genreIdx)->fieldIndex("sexe"));
 
 
     //La classe QDataWidgetMapper fournit un mappage entre une section d'un modèle de données et des widgets.
@@ -248,15 +212,13 @@ void GestionParticipant::createTableView()
     //Appliquer le model QSqlRelationTableModel
     mapper->setModel(ui.participantTable->model());
 
-
     mapper->setItemDelegate(new QSqlRelationalDelegate(this));
     //Element necessaire du mappage pour l'édition du model de vue fournis à l'organisateur
-    mapper->addMapping(ui.nomEdit, 1);
-    mapper->addMapping(ui.prenomEdit, 2);
-    mapper->addMapping(ui.mailEdit, 3);
-    mapper->addMapping(ui.genreEdit, 6);
-    mapper->addMapping(ui.dateEdit, 5);
-    //mapper->addMapping(ui.rfidEdit, 7);
+    mapper->addMapping(ui.nomEdit, model->fieldIndex("lastname"));
+    mapper->addMapping(ui.prenomEdit, model->fieldIndex("firstname"));
+    mapper->addMapping(ui.mailEdit, model->fieldIndex("mail"));
+    mapper->addMapping(ui.genreEdit, genreIdx);
+    mapper->addMapping(ui.dateEdit, model->fieldIndex("year"));
 
     //Appliquer un signal lorsqu'une valeur à été changer dans le model du tableau
     connect(ui.participantTable->selectionModel(),
@@ -267,9 +229,6 @@ void GestionParticipant::createTableView()
 
     //definir la selection de l'index par default de la ligne et de la colonne donc ligne 0 et colonne 0
     ui.participantTable->setCurrentIndex(model->index(0, 0));
-
-
-    qDebug() << m_db->getParticipantData(5);
 
 }
 
@@ -294,7 +253,6 @@ void GestionParticipant::on_suprButton_clicked()
 {
     //Recuperer toutes les valeurs situes dans le tableau et récuperer seulement la ligne selectionner pour pouvoir récuperer les valeur de cette ligne.
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
-    qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
     m_db->removeParticipant(selectedIndexes[0].data().value<int>());  //Enlever le participant grace à l'id
     this->createTableView(); //Creation du tableau et raffraichissement du model
 }
@@ -303,8 +261,6 @@ void GestionParticipant::on_suprButton_clicked()
 void GestionParticipant::on_updateButton_clicked()
 {
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
-
-    qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
 
 
     if(!selectedIndexes.isEmpty())
@@ -340,7 +296,7 @@ void GestionParticipant::on_updateButton_clicked()
             q.bindValue(":genre_id", 3);
         }
 
-        q.bindValue(":rfid", selectedIndexes[7].data().value<int>());
+        //q.bindValue(":rfid", selectedIndexes[7].data().value<int>());
         if(q.exec()) //verification True = la requete a bien été mis à jour ou false erreur du sql
         {
             QMessageBox::information(this, "Gestion des Participants", "Le participant : "
@@ -369,7 +325,8 @@ void GestionParticipant::serialReceived()
 
             }
             id.replace("\r\n", "");
-            qDebug() << id;
+
+            qDebug() << id << QDateTime::currentSecsSinceEpoch();
             ui.razButton->setEnabled(true);
 
 
@@ -402,57 +359,96 @@ void GestionParticipant::on_razButton_clicked()
     {
          ui.razButton->setEnabled(false);
 
-
-
-         /*
-           //Methode compliquer
-         //Ancien code permet de d'obtenir l'identifiant du portique
-         QThread *thread = new QThread();
-         Portique *portique = new Portique();
-
-         portique->moveToThread(thread);
-         thread->start();
-
-         connect(thread, SIGNAL(started()), portique, SLOT(doWork()));
-
-         connect(portique, SIGNAL(getData(QByteArray)), this, SLOT(razGetData(QByteArray)));
-         connect(portique, SIGNAL(workFinished()), this, SLOT(finishedRead()));
-
-         connect(portique, SIGNAL(workFinished()), thread, SLOT(quit()));
-
-         connect(portique, SIGNAL(workFinished()), portique, SLOT(deleteLater()));
-         connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-
-         qDebug() << "Recuperation de la data..";
-
-         //ToDo : connect signal..
-         */
     }
 
 }
 
 
 /////////////////////// PARTIE SIMULATION ////////////////////////////////////////////
+/// \brief GestionParticipant::on_razSimButton_clicked
+///
+/// PROTOTYPE
 
 void GestionParticipant::on_razSimButton_clicked()
 {
      RaceManager::getInstance()->setMode(RaceManager::RAZ);
 
-     QJsonObject obj = this->sim_config->getAll();
+     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
 
-     QJsonValueRef m_values = obj.find(QString::number(this->participantSimId++)).value();
-     //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
-     QJsonObject m_obj_values = m_values.toObject();
+     if(!m_db->isFingerExist(selectedIndexes[0].data().value<int>()) && !m_db->isPortiqueBIDExist(selectedIndexes[0].data().value<int>()))
+     {
 
-    // m_db->setFinger(m_obj_values.find())
+         QJsonObject obj = this->sim_config->getAll();
+
+         QJsonValueRef m_values = obj.find(QString::number(this->participantSimId++)).value();
+         //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+         QJsonObject m_obj_values = m_values.toObject();
 
 
+         QVariant fingerId = m_obj_values.value("finger_id").toVariant();
+         QVariant bidId = m_obj_values.value("passage_id").toVariant();
+
+         qDebug() << fingerId << bidId;
+
+         //int passage_start = m_obj_values.value("passage_start").toInt();
+
+         m_db->setFinger(selectedIndexes[0].data().value<int>(), fingerId.toLongLong());
+         m_db->setPortiqueBID(selectedIndexes[0].data().value<int>(), bidId.toLongLong());
+
+
+         //qDebug() << m_db->getParticipantData(selectedIndexes[0].data().value<int>());
+
+         QMessageBox::information(this, "Participant", "le participant à bien démarré la course !");
+     } else {
+          QMessageBox::warning(this, "RAZ", "Ce participant possède déjà un numéro inscrit sur le RFID ainsi que sur le doigt");
+     }
 }
 
 
 void GestionParticipant::on_dataSimButton_clicked()
 {
     RaceManager::getInstance()->setMode(RaceManager::DATA);
+
+
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+
+    if(m_db->isFingerExist(selectedIndexes[0].data().value<int>()) && m_db->isPortiqueBIDExist(selectedIndexes[0].data().value<int>()))
+    {
+
+        QJsonObject obj = this->sim_config->getAll();
+
+
+        QSqlQuery q = m_db->getDb().exec();
+
+        q.prepare("SELECT finger FROM participant_races WHERE participant_id=?");
+        q.addBindValue(selectedIndexes[0].data().value<int>());
+        qDebug() << q.exec();
+
+        while(q.next())
+        {
+            //qDebug() << q.value(0);
+
+
+            for(int i = 1; i < 5; i++)
+            {
+
+               QJsonValueRef m_values = obj.find(QString::number(i)).value();
+
+
+               //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+               QJsonObject m_obj_values = m_values.toObject();
+
+
+               if(m_obj_values.value("finger_id").toVariant().toLongLong() == q.value(0).toLongLong())  //Trouver les données (JsonObject) du participantà l'aide de l'id du doigt(RFID)
+               {
+                   qDebug() << m_obj_values;
+
+               }
+               //int passageId = m_obj_values.value("passage_id").toInt();
+               //int passage_start = m_obj_values.value("passage_start").toInt();
+           }
+        }
+    }
 }
 
 

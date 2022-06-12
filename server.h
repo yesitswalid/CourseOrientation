@@ -5,7 +5,7 @@
 
 #define PORT 1234
 
-#define DEFAULT 0
+#define DEFAUT 0
 #define RAZ 1
 #define DATA 2
 
@@ -28,7 +28,7 @@ public:
         socket->bind(PORT);
         socket->connect(socket, SIGNAL(readyRead()),this,SLOT(readPendingDiagrams()));
         qDebug() << "Attente de données depuis le port: " << PORT << " ... \n";
-        MODE = DEFAULT;
+        MODE = DEFAUT;
     }
 
 
@@ -49,7 +49,7 @@ public slots:
         socket->readDatagram(buffer.data(), buffer.size(),
                              &sender, &senderPort);
 
-        /*
+
         qDebug() << "Client from: " << sender.toString();
         qDebug() << "Client port: " << senderPort;
         qDebug() << "Buffer: " << buffer;
@@ -57,11 +57,11 @@ public slots:
         lecteurSender = sender;
         lecteurPort = senderPort;
 
-        socket->writeDatagram(QByteArray("D"), lecteurSender, lecteurPort);
-        */
+        socket->writeDatagram(QByteArray("aa"), lecteurSender, lecteurPort);
 
 
-        if(RaceManager::getInstance()->getMode() == DEFAULT)
+
+        if(RaceManager::getInstance()->getMode() == DEFAUT)
         {
 
             qDebug() << "Client from (DEFAULT): " << sender.toString();
@@ -71,8 +71,9 @@ public slots:
             lecteurSender = sender;
             lecteurPort = senderPort;
 
-            socket->writeDatagram(QByteArray("D"), lecteurSender, lecteurPort);
+            socket->writeDatagram(QByteArray("R"), lecteurSender, lecteurPort);
             RaceManager::getInstance()->setMode(RAZ);
+
         } else if(RaceManager::getInstance()->getMode() == RAZ) {
             if(!buffer.contains("acknowledged"))
             {

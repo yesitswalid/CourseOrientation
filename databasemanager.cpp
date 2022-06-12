@@ -1,23 +1,18 @@
 #include "databasemanager.h"
 #include "racemanager.h"
 #include <QMessageBox>
-
+#include <QApplication>
 
 DatabaseManager::DatabaseManager()
 {
-    this->fileInfo = new QFileInfo();
-    this->fileInfo->setFile("course.db");
+
 }
 
-DatabaseManager::DatabaseManager(QString filePath)
-{
-    this->fileInfo = new QFileInfo();
-    this->fileInfo->setFile(filePath);
-}
 
 DatabaseManager::~DatabaseManager()
 {
-    delete this->fileInfo;
+    m_db.commit();
+    m_db.close();
 }
 
 void DatabaseManager::setDb(QSqlDatabase m_db)
@@ -36,15 +31,10 @@ QSqlError DatabaseManager::initDb()
     QSqlDatabase db;
     this->setDb(QSqlDatabase::addDatabase("QSQLITE"));
     db = this->getDb();
-    db.setDatabaseName(this->fileInfo->absoluteFilePath());
+    db.setDatabaseName(QApplication::instance()->applicationDirPath() + "/course.db");
 
     if (!db.open())
         return db.lastError();
-
-    QStringList tables = db.tables();
-    if (tables.contains("mail", Qt::CaseInsensitive)
-        && tables.contains("nom", Qt::CaseInsensitive))
-        return QSqlError();
 
     QSqlQuery q;
     if (!q.exec(PARTICIPANTS_SQL))
@@ -77,15 +67,10 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
     QSqlDatabase db;
     this->setDb(QSqlDatabase::addDatabase("QSQLITE", connectionName));
     db = this->getDb();
-    db.setDatabaseName(this->fileInfo->absoluteFilePath());
+    db.setDatabaseName(QApplication::instance()->applicationDirPath() + "/course.db");
 
     if (!db.open())
         return db.lastError();
-
-    QStringList tables = db.tables();
-    if (tables.contains("mail", Qt::CaseInsensitive)
-        && tables.contains("nom", Qt::CaseInsensitive))
-        return QSqlError();
 
     QSqlQuery q;
     if (!q.exec(PARTICIPANTS_SQL))
@@ -221,7 +206,7 @@ QList<QVariant> DatabaseManager::getParticipantData(int participantId)
 {
     QSqlQuery q;
     q = m_db.exec();
-    q.prepare("SELECT * FROM participants as p, participant_races as pr, participant_races_data as prc WHERE p.id=pr.participant_id=prc.participant_id=?");
+    q.prepare("SELECT * FROM participants WHERE id=?");
     q.addBindValue(participantId);
     q.exec();
 
@@ -229,6 +214,7 @@ QList<QVariant> DatabaseManager::getParticipantData(int participantId)
     int i = 0;
     while(q.next())
     {
+        qDebug() << q.value(i);
         data.append(q.value(i));
         i++;
     }
@@ -254,7 +240,7 @@ bool DatabaseManager::isFingerExist(int participantId)
 }
 
 
-void DatabaseManager::setFinger(int participantId, int fingerId)
+void DatabaseManager::setFinger(int participantId, qlonglong fingerId)
 {
     QSqlQuery q;
     q = m_db.exec();
@@ -267,7 +253,7 @@ void DatabaseManager::setFinger(int participantId, int fingerId)
 
 
 
-bool DatabaseManager::isPortiqueRFIDExist(int participantId)
+bool DatabaseManager::isPortiqueBIDExist(int participantId)
 {
     QSqlQuery q;
     q = m_db.exec();
@@ -285,12 +271,12 @@ bool DatabaseManager::isPortiqueRFIDExist(int participantId)
     return  (recCount > 0);
 }
 
-void DatabaseManager::setPortiqueRFID(int participantId, int rfid)
+void DatabaseManager::setPortiqueBID(int participantId, qlonglong bid)
 {
     QSqlQuery q;
     q = m_db.exec();
     q.prepare("UPDATE participant_races SET rfid=? WHERE participant_id=? and race_id=?");
-    q.addBindValue(rfid);
+    q.addBindValue(bid);
     q.addBindValue(participantId);
     q.addBindValue(RaceManager::getInstance()->getRaceId());
     q.exec();
@@ -352,16 +338,23 @@ bool DatabaseManager::isRaceExist(const QString &raceName)
      return  (recCount > 0);
 }
 
-void DatabaseManager::addRace(int race_id, int id_department, const QString name, const QString location, const QString date, const QString description)
+void DatabaseManager::addRace(int race_id, int id_department, QString name, QDateTime date, QString location,
+                              QString gps_longitude, QString gps_latitude, int difficulty, int type, int book)
 {
       QSqlQuery q;
       q = m_db.exec();
       q.prepare(INSERT_RACE_SQL);
+
       q.addBindValue(race_id);
       q.addBindValue(id_department);
       q.addBindValue(name);
-      q.addBindValue(location);
       q.addBindValue(date);
-      q.addBindValue(description);
-      q.exec();
+      q.addBindValue(location);
+      q.addBindValue(gps_longitude);
+      q.addBindValue(gps_latitude);
+      q.addBindValue(difficulty);
+      q.addBindValue(type);
+      q.addBindValue(book);
+
+      qDebug() << q.exec();
 }

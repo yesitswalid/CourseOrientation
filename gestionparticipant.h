@@ -20,8 +20,6 @@ public:
      GestionParticipant(DatabaseManager *db);
     ~GestionParticipant();
     void createTableView();
-    void init();
-
 private slots:
     void on_suprButton_clicked();
 
@@ -47,7 +45,8 @@ private:
     //QSqlRelationalTableModel *model;
 
     //Partie du model du tableau
-    QSqlQueryModel *model;
+    //QSqlQueryModel *model;
+    QSqlRelationalTableModel *model;
     DatabaseManager *m_db;
     int genreIdx;
     void createMenuBar();
@@ -58,7 +57,7 @@ private:
     //partie simulation
     Configuration *sim_config;
 
-    int participantSimId = 0;
+    int participantSimId = 1;
 
 };
 

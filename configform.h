@@ -6,15 +6,17 @@
 #include <configuration.cpp>
 #include <QSqlDatabase>
 #include <QJsonObject>
+#include <mysqldata.cpp>
 
 class ConfigForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ConfigForm();
+     explicit ConfigForm();
     ~ConfigForm();
-    QJsonObject getDatabaseData();
+     QJsonObject getDatabaseData();
+     void init(MySQLData *data);
 
 private slots:
     void on_continueButton_clicked();
@@ -22,8 +24,9 @@ private slots:
 
 private:
     Ui::ConfigForm ui;
-    QSqlDatabase *m_db;
+    QWidget *app;
     Configuration *configuration;
+    MySQLData *m_db;
 };
 
 #endif // CONFIGFORM_H

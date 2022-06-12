@@ -15,6 +15,11 @@ public:
      GestionPortique();
     ~GestionPortique();
 
+private slots:
+     void on_razButton_clicked();
+
+     void on_dataButton_clicked();
+
 private:
     Ui::GestionPortique ui;
 };

@@ -12,9 +12,9 @@ class RaceManager
 
 
 public:
-
-    const static int RAZ = 0;
-    const static int DATA = 1;
+    const static int DEFAULT = 0;
+    const static int RAZ = 1;
+    const static int DATA = 2;
 
     struct Race
     {
@@ -87,7 +87,7 @@ protected:
 
 private:
     bool raceSelected = false;
-    int mode = RAZ; //par defaut le mode est à RAZ
+    int mode = DEFAULT; //par defaut le mode est à DEFAULT
     QVector<Race> races;
     QString name;
     int raceId;

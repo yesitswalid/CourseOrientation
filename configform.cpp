@@ -2,7 +2,7 @@
 #include "ui_configform.h"
 #include <QMessageBox>
 #include <QtSql>
-
+#include <mysqldata.cpp>
 
 #define PORT_DEFAULT 3306
 
@@ -11,10 +11,6 @@ ConfigForm::ConfigForm()
 {
    ui.setupUi(this);
    this->configuration = new Configuration();
-
-   QSqlDatabase m_dbCopy = QSqlDatabase::addDatabase("QMYSQL", "myTestMysql");
-   m_db = new QSqlDatabase(m_dbCopy);
-   m_dbCopy.close();
 
    //récuperation du contenus de la configuration
    QJsonObject obj = configuration->getAll();
@@ -59,13 +55,15 @@ ConfigForm::ConfigForm()
    }
 }
 
+void ConfigForm::init(MySQLData *data)
+{
+    m_db = data;
+
+}
 ConfigForm::~ConfigForm()
 {
     //Nettoyer la memoire en enlevant la config.
     delete configuration;
-    m_db->close();
-    delete m_db;
-
 }
 
 void ConfigForm::on_continueButton_clicked()
@@ -141,13 +139,15 @@ void ConfigForm::on_testButton_clicked()
         return;
     }
 
-    m_db->setUserName(ui.userEdit->text().replace(" ", ""));
-    m_db->setPassword(ui.mdpEdit->text().replace(" ", ""));
-    m_db->setHostName(ui.ipEdit->text().replace(" ", ""));
-    m_db->setDatabaseName(ui.dbEdit->text().replace(" ", ""));
-    m_db->setPort(ui.portEdit->text().toInt());
 
-    if (m_db->open())
+    m_db->getDatabase()->setUserName(ui.userEdit->text().replace(" ", ""));
+    m_db->getDatabase()->setPassword(ui.mdpEdit->text().replace(" ", ""));
+    m_db->getDatabase()->setHostName(ui.ipEdit->text().replace(" ", ""));
+    m_db->getDatabase()->setDatabaseName(ui.dbEdit->text().replace(" ", ""));
+    m_db->getDatabase()->setPort(ui.portEdit->text().toInt());
+
+
+    if (m_db->getDatabase()->open())
     {
         QMessageBox::information(this, "Base de données",
                     "Test Connection Ok. (Base de données connecté)");

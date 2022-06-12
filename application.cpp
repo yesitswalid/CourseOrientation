@@ -21,6 +21,7 @@ void Application::init()
 
      m_db = new DatabaseManager();
 
+
     // Initialisation base de données
     QSqlError err = m_db->initDb();
     if (err.type() != QSqlError::NoError) {
@@ -40,11 +41,11 @@ void Application::init()
     //Gestion du participant
 
     this->gestion_participant = new GestionParticipant(m_db);
-    this->gestion_participant->init();
 
     //Inscription Formulaire
 
     this->inscription_form = new InscriptionForm(m_db);
+
 
 
     //Config Base de données
@@ -66,10 +67,19 @@ void Application::init()
                  m_obj_values["mot_de_passe"].toString(),
                  m_obj_values["ip"].toString(),
                  m_obj_values["database"].toString());
-    } else {
-        //Hardcoded
-        m_mydb = new MySQLData("root", "walid13", "127.0.0.1", "coursorient");
+
     }
+    else
+    {
+        m_mydb = new MySQLData("admin", "73L5j28vddk3uTK", "1172.16.10.22", "coursorient");
+    }
+
+    this->config_form->init(m_mydb);
+
+
+
+    //Config Base de données
+   // this->config_form = new ConfigForm(m_mydb);
 
 
     //Initialisation des courses.
@@ -91,14 +101,14 @@ Application::Application(QWidget *parent)
 
 Application::~Application()
 {
-    //Nettoyer la memoire après la fermuture de programme
+    //Nettoyer la memoire après la fermuture de l'application
     delete ui;
     delete gestion_participant;
     delete inscription_form;
     delete config_form;
     delete configuration;
-    delete m_db;
-    delete m_sqlite;
+    //delete m_db;
+   // delete m_sqlite;
     delete m_mydb;
 }
 
@@ -111,7 +121,7 @@ void Application::initRaces()
 
     QVector<RaceManager::Race> races;
 
-    query = m_mydb->getDatabase()->exec();
+    query = m_db->getDb().exec();
     query.prepare(QString("SELECT * FROM races"));
     if (!query.exec())
     {
@@ -142,13 +152,17 @@ void Application::initRaces()
         race.type = type;
         race.book = book;
 
+
         races.push_back(race);
 
         //RaceManager::getInstance()->addRace(race);
 
     }
 
+
     RaceManager::getInstance()->setRaces(races);
+
+    ui->comboBox->clear();
 
     ui->comboBox->addItem("-");
     int i = 0;
@@ -200,11 +214,18 @@ void Application::on_actionBddConfig_triggered()
 }
 
 
-void Application::on_actionExporter_vers_triggered()
+void Application::on_actionExporter_triggered()
 {
     if(m_sqlite->exportSql())
     {
+        ///
+        /// \brief QMessageBox::information
+        ///
+        ///
          QMessageBox::information(this, "Exportation", "L'exportation des données des participants on été envoyée au serveur web !");
+
+
+
     } else {
          QMessageBox::warning(this, "Exportation", "Erreur lors de l'exportation des données vérifier la base de données du serveur web !");
     }
@@ -214,6 +235,8 @@ void Application::on_actionExporter_vers_triggered()
 void Application::on_actionImporter_triggered()
 {
     if(m_mydb->importData()){
+
+        initRaces();
         QMessageBox::information(this, "Importation", "Importation avec succès des données du site web !");
     } else {
         QMessageBox::warning(this, "Importation", "Erreur de l'importation vérifier la base de données du serveur web !");
@@ -276,4 +299,6 @@ void Application::on_actionQuitter_2_triggered()
 {
     this->close();
 }
+
+
 

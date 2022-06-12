@@ -12,8 +12,7 @@ int main(int argc, char *argv[])
     w.show();
 
     //Initialisation du serveur pour la communication du portique
-    Server *server = new Server();
-
+    new Server();
 
     /*
     QThread *t = new QThread();

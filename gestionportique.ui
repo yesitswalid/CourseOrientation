@@ -31,7 +31,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="razButton">
       <property name="text">
        <string>RAZ</string>
       </property>
@@ -45,7 +45,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="dataButton">
       <property name="text">
        <string>DATA</string>
       </property>
