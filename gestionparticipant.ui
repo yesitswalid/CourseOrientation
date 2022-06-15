@@ -146,6 +146,9 @@
           </item>
           <item row="9" column="0">
            <widget class="QPushButton" name="razSimButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>RAZ</string>
             </property>
@@ -153,6 +156,9 @@
           </item>
           <item row="10" column="0">
            <widget class="QPushButton" name="dataSimButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>DATA</string>
             </property>

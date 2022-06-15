@@ -313,7 +313,7 @@ void GestionParticipant::getCardId(QString cardId)
                         QMessageBox::information(this, "Lecteur", "Le participant: " + q.value(0).toString() + " " + q.value(1).toString() + " à scanner son badge: " + cardId);
                     }
 
-                    m_db->setDepartTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
+                    //m_db->setDepartTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
 
                     qDebug() << "======================";
                 }
@@ -352,7 +352,6 @@ void GestionParticipant::getResultDataParticipant(QString carteId, int pointsTot
                         qDebug() << "PARTICIPANT ID: " <<  selectedIndexes[0].data().value<int>();
                         m_db->setPartipantPoints(selectedIndexes[0].data().value<int>(), pointsTotal);
                         m_db->setPartipantBeacons(selectedIndexes[0].data().value<int>(), nbBalises);
-                        m_db->setFinishTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
                         QMessageBox::information(this, "Lecteur", "Données recu de " + q.value(1).toString() + " " + q.value(2).toString() + " !");
 
                     }
@@ -426,21 +425,24 @@ void GestionParticipant::serialReceived()
 
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
 
-
+    if(RaceManager::getInstance()->getMode() == RaceManager::RAZ)
+    {
 
     if(RaceManager::getInstance()->isRaceSelected())
     {
+
 
         while(serial->canReadLine())
         {
 
             QByteArray data = serial->readLine();
 
-            if(RaceManager::getInstance()->getMode() == RaceManager::RAZ)
-            {
+                qDebug() << "Test";
 
                 if(!ui.portiqueButton->isEnabled())
                 {
+                    qDebug() << "MDrrr";
+
                     QString id = "";
                     for(int i = 7; i < data.length(); i++)
                     {
@@ -460,7 +462,6 @@ void GestionParticipant::serialReceived()
                     {
 
                         m_db->setPortiqueBID(selectedIndexes[0].data().value<int>(), id);
-
                         m_db->setDepartTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
                         QMessageBox::information(this, "Portique", "Départ du dossard: #" + id + " !");
                     } else {
@@ -471,8 +472,15 @@ void GestionParticipant::serialReceived()
 
 
                 }
-            } if(RaceManager::getInstance()->getMode() == RaceManager::DATA)
+            }
+           }
+        } else if(RaceManager::getInstance()->getMode() == RaceManager::DATA)
+        {
+            while(serial->canReadLine())
             {
+
+                QByteArray data = serial->readLine();
+
 
                 if(!ui.portiqueButton->isEnabled())
                 {
@@ -485,18 +493,28 @@ void GestionParticipant::serialReceived()
                     id.replace("\r\n", "");
 
                     qDebug() << "======== PORTIQUE ========";
-                    qDebug() << "Mode: DATA";
+                    qDebug() << "Mode: RAZ";
                     qDebug() << "Dossard ID:" << id << "Timestamp: " <<  QDateTime::currentSecsSinceEpoch();
-                    qDebug() << "ARRIVE : " << QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch()).toLocalTime().toString("yyyy/MM/dd hh:mm:ss");
+                    qDebug() << "ARRIVE: " << QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch()).toLocalTime().toString("yyyy/MM/dd hh:mm:ss");
+
                     qDebug() << "=======================";
 
+                    if(!selectedIndexes.isEmpty())
+                    {
+
+                        m_db->setPortiqueBID(selectedIndexes[0].data().value<int>(), id);
+                        m_db->setFinishTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
+                        QMessageBox::information(this, "Portique", "Arrive  du dossard: #" + id + " !");
+                    } else {
+                        QMessageBox::warning(this, "Portique", "Vous n'avez pas selectionné le participant !");
+                    }
 
                     ui.portiqueButton->setEnabled(true);
-                }
 
+
+                }
             }
-        }
-    }
+           }
 }
 
 

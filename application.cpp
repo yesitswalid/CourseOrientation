@@ -72,7 +72,7 @@ void Application::init()
     }
     else
     {
-        m_mydb = new MySQLData("admin", "73L5j28vddk3uTK", "1172.16.10.22", "coursorient");
+        m_mydb = new MySQLData("admin", "73L5j28vddk3uTK", "172.16.10.22", "coursorient");
     }
 
     this->config_form->init(m_mydb);
