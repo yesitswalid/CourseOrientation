@@ -1,7 +1,5 @@
 #include "racemanager.h"
 
-
-
 RaceManager* RaceManager::instance = 0;
 
 RaceManager* RaceManager::getInstance()
@@ -17,8 +15,9 @@ RaceManager* RaceManager::getInstance()
 
 RaceManager::RaceManager()
 {
-}
 
+    //server = new Server();
+}
 
 void RaceManager::setRaceSelected(bool isSelected)
 {

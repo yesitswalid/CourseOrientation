@@ -24,18 +24,18 @@ const auto PARTICIPANTS_RACES_SQL = QString(R"(
     id integer primary key,
     participant_id integer,
     race_id integer,
-    finger integer DEFAULT NULL,
-    rfid integer DEFAULT NULL)
+    finger varchar DEFAULT NULL,
+    bid varchar DEFAULT NULL)
     )");
 
 const auto PARTICIPANTS_RACES_DATA_SQL = QString(R"(
     create table if not exists participant_races_data(
-    id integer primary key,
+    race_id integer primary key,
     participant_id integer,
-    race_id integer,
-    beacons integer DEFAULT NULL,
+    beacons integer DEFAULT 0,
     points integer DEFAULT 0,
-    race_duration integer DEFAULT 0)
+    start DATETIME DEFAULT 0,
+    end DATETIME DEFAULT 0)
     )");
 
 const auto GENDERS_SQL = QString(R"(
@@ -66,19 +66,10 @@ const auto CHECKPOINTS_SQL = QString(R"(
     longitude vachar,
     attitude varchar,
     race_id integer,
-    order_id varchar,
+    participant_id integer,
+    order_id integer,
     points integer)
 )");
-
-
-const auto ARRIVALS_SQL = QString(R"(
-    create table if not exists arrivals(
-    id integer primary key,
-    participant_id integer,
-    checkpoint_id integer,
-    datetime varchar)
-)");
-
 
 
 
@@ -93,12 +84,22 @@ const auto INSERT_PARTICIPANT_RACE_SQL = QString(R"(
                       values(?, ?)
     )");
 
+const auto INSERT_PARTICIPANT_DATA_RACE_SQL = QString(R"(
+    insert into participant_races_data (race_id, participant_id, beacons, points)
+    values(?, ?, ?, ?)
+)");
+
 const auto INSERT_GENDER_SQL = QString(R"(
-    INSERT OR REPLACE INTO genders (sexe) values(?);
+    INSERT OR REPLACE INTO genders (sexe) values(?)
 )");
 
 const auto INSERT_RACE_SQL = QString(R"(
-   INSERT INTO races (id, id_department, name, date, location, gps_longitude, gps_latitude, difficulty, type, book) values(?,?,?,?,?,?,?,?,?,?)
+   insert into races (id, id_department, name, date, location, gps_longitude, gps_latitude, difficulty, type, book) values(?,?,?,?,?,?,?,?,?,?)
+)");
+
+
+const auto INSERT_CHECKPOINT_SQL = QString(R"(
+   insert into checkpoints(altitude, longitude, attitude, race_id, participant_id, order_id, points) values(?, ?, ?, ?, ?, ?, ?)
 )");
 
 ////////////////////////// REQUETE POUR SUPPRIMER UNE LIGNE //////////////////////////////////
@@ -143,6 +144,10 @@ const auto SELECT_DATA_PARTICIPANT_RACE = QString(R"(SELECT * FROM participant_r
 
 const auto SELECT_DATA_RACE = QString(R"(SELECT * FROM races WHERE name=?)");
 
+const auto SELECT_ORDER_CHECKPOINT_PARTICIPANT = QString(R"(SELECT * FROM checkpoints WHERE order_id=? and race_id=? and participant_id=?")");
+
+const auto SELECT_PARTICIPANT_CHECKPOINT = QString(R"(SELECT * FROM checkpoints WHERE participant_id=? and race_id=?")");
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class DatabaseManager
@@ -169,21 +174,33 @@ public:
                                               const QString &password,
                                               const QString &year,
                                               int genreId);
+
     void addParticipantRace(int participantId, int raceId);
-
-
     bool isParticipantRaceExist(int participantId);
+
+    void addParticipantCheckpoint(QString altitude, QString longitude, QString attitude, int raceId, int participantId, int orderId, int points);
+    bool hasParticipantCheckpoint(int orderId, int raceId, int participantId);
+
+    void addParticipantRaceData(int participantId, int beacons, int points);
+    bool hasParticipantRaceData(int participantId);
+
+    void setDepartTimeParticipant(int participantId, QDateTime startTime);
+    void setFinishTimeParticipant(int participantId, QDateTime endTime);
+
+    void setPartipantBeacons(int participantId, int beacons);
+    void setPartipantPoints(int participantId, int points);
+
 
     QList<QVariant> getParticipantData(int participantId);
 
 
-    //PARTIE DOSSAR PASSAGE ET DOIGT(RFID)
+    //PARTIE DOSSARD PASSAGE ET DOIGT(RFID) du participant
 
     bool isPortiqueBIDExist(int participantId);
     bool isFingerExist(int participantId);
 
-    void setPortiqueBID(int participantId, qlonglong bid);
-    void setFinger(int participantId, qlonglong fingerId);
+    void setPortiqueBID(int participantId, QString bid);
+    void setFinger(int participantId, QString fingerId);
 
 
     //PARTIE COURSE
@@ -192,6 +209,7 @@ public:
                   QString gps_longitude, QString gps_latitude, int difficulty, int type, int book);
 
     bool isRaceExist(const QString &raceName);
+
 
     //Copy base de données
     void setDb(QSqlDatabase m_db);

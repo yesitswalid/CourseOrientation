@@ -58,7 +58,6 @@
      <string>Fichier</string>
     </property>
     <addaction name="actionExporter"/>
-    <addaction name="actionExporter_vers"/>
     <addaction name="actionImporter"/>
     <addaction name="actionReinitialiser_les_donn_es"/>
     <addaction name="separator"/>
@@ -104,15 +103,10 @@
     <string>Importer</string>
    </property>
   </action>
-  <action name="actionExporter_vers">
+  <action name="actionReinitialiser_les_donn_es">
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="text">
-    <string>Exporter vers</string>
-   </property>
-  </action>
-  <action name="actionReinitialiser_les_donn_es">
    <property name="text">
     <string>Reinitialiser les données</string>
    </property>

@@ -53,6 +53,9 @@ private slots:
 
     void on_actionExporter_triggered();
 
+
+    void on_actionReinitialiser_les_donn_es_triggered();
+
 private:
     Ui::Application *ui;
     RaceManager *race;

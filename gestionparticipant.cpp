@@ -13,13 +13,19 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <string.h>
-
+#include "server.h"
 
 GestionParticipant::GestionParticipant()
 {
     m_db = new DatabaseManager();
     ui.setupUi(this);
 
+
+    //Connecter le signal pour recevoir l'id de la carte
+    connect(Server::getInstance(), SIGNAL(getCardId(QString)), this, SLOT(getCardId(QString)));
+
+    //Connecter le signal pour recevoir les données de la course
+    connect(Server::getInstance(), SIGNAL(getCardId(getResultDataParticipant(QString, int, int))), this, SLOT(getResultDataParticipant(QString, int, int)));
 
 
     //// CREATION DU MENU QUITTER ////
@@ -82,6 +88,13 @@ GestionParticipant::GestionParticipant(DatabaseManager *db)
 {
     m_db = db;
     ui.setupUi(this);
+
+
+    //Connecter le signal pour recevoir l'id de la carte
+    connect(Server::getInstance(), SIGNAL(getCardId(QString)), this, SLOT(getCardId(QString)));
+
+    //Connecter le signal pour recevoir les données de la course
+    connect(Server::getInstance(), SIGNAL(getResultDataParticipant(QString, int, int)), this, SLOT(getResultDataParticipant(QString, int, int)));
 
     //// CREATION DU MENU QUITTER ////
     ///
@@ -258,6 +271,102 @@ void GestionParticipant::on_suprButton_clicked()
 }
 
 
+
+///// PARTIE RAZ RECUPERATION DE LA CARTE ID ET IDENTIFIER LE PARTICIPANT /////
+/// \brief GestionParticipant::getCardId
+/// \param cardId
+///
+void GestionParticipant::getCardId(QString cardId)
+{
+    qDebug() << "Depuis Gestion Particpant: " << cardId;
+
+
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+
+    if(!selectedIndexes.isEmpty())
+    {
+
+
+            if(RaceManager::getInstance()->getMode() == RaceManager::RAZ)
+            {
+
+                if(!ui.doigtButton->isEnabled())
+                {
+
+                    qDebug() << "======== LECTEUR RFID ========";
+                    qDebug() << "Mode: RAZ";
+                    qDebug() << "BADGE ID:" << cardId;
+
+                    QSqlQuery q = m_db->getDb().exec();
+
+                    q.prepare("SELECT firstname, lastname FROM participants WHERE id=?");
+                    q.addBindValue(selectedIndexes[0].data().value<int>());
+                    q.exec();
+
+                    m_db->setFinger(selectedIndexes[0].data().value<int>(), cardId);
+
+                    ui.doigtButton->setEnabled(true);
+
+                    while(q.next())
+                    {
+                        qDebug() << "Participant: " << q.value(0).toString() << q.value(1).toString();
+                        QMessageBox::information(this, "Lecteur", "Le participant: " + q.value(0).toString() + " " + q.value(1).toString() + " à scanner son badge: " + cardId);
+                    }
+
+                    m_db->setDepartTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
+
+                    qDebug() << "======================";
+                }
+
+            }
+    } else {
+        QMessageBox::warning(this, "Lecteur", "Vous n'avez pas selectionné le participant !");
+    }
+
+}
+
+
+void GestionParticipant::getResultDataParticipant(QString carteId, int pointsTotal, int nbBalises)
+{
+
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+
+    if(RaceManager::getInstance()->isRaceSelected())
+    {
+
+         if(!ui.doigtButton->isEnabled())
+         {
+
+                    qDebug() << "======== LECTEUR RFID ========";
+                    qDebug() << "Mode: DATA";
+                    qDebug() << "BADGE ID: " << carteId;
+
+                    QSqlQuery q = m_db->getDb().exec();
+
+                    q.prepare("SELECT firstname, lastname FROM participants WHERE id=?");
+                    q.addBindValue(selectedIndexes[0].data().value<int>());
+                    q.exec();
+
+                    while(q.next())
+                    {
+                        qDebug() << "PARTICIPANT ID: " <<  selectedIndexes[0].data().value<int>();
+                        m_db->setPartipantPoints(selectedIndexes[0].data().value<int>(), pointsTotal);
+                        m_db->setPartipantBeacons(selectedIndexes[0].data().value<int>(), nbBalises);
+                        m_db->setFinishTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
+                        QMessageBox::information(this, "Lecteur", "Données recu de " + q.value(1).toString() + " " + q.value(2).toString() + " !");
+
+                    }
+          }
+
+    } else {
+        QMessageBox::warning(this, "Lecteur", "Vous n'avez pas selectionné de course (Impossible d'obtenir les données du participant) !");
+     }
+
+    ui.doigtButton->setEnabled(true);
+}
+
+
+
 void GestionParticipant::on_updateButton_clicked()
 {
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
@@ -309,59 +418,122 @@ void GestionParticipant::on_updateButton_clicked()
      }
 }
 
+
+////// PARTIE MAMOUN PORTIQUE (RECUPERATION DE DONNEES) ////////////
+
 void GestionParticipant::serialReceived()
 {
 
-    while(serial->canReadLine())
-    {
-        QByteArray data = serial->readLine();
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
 
-        if(!ui.razButton->isEnabled())
+
+
+    if(RaceManager::getInstance()->isRaceSelected())
+    {
+
+        while(serial->canReadLine())
         {
-            QString id = "";
-            for(int i = 7; i < data.length(); i++)
+
+            QByteArray data = serial->readLine();
+
+            if(RaceManager::getInstance()->getMode() == RaceManager::RAZ)
             {
-                id += data[i];
+
+                if(!ui.portiqueButton->isEnabled())
+                {
+                    QString id = "";
+                    for(int i = 7; i < data.length(); i++)
+                    {
+                        id += data[i];
+
+                    }
+                    id.replace("\r\n", "");
+
+                    qDebug() << "======== PORTIQUE ========";
+                    qDebug() << "Mode: RAZ";
+                    qDebug() << "Dossard ID:" << id << "Timestamp: " <<  QDateTime::currentSecsSinceEpoch();
+                    qDebug() << "DEPART: " << QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch()).toLocalTime().toString("yyyy/MM/dd hh:mm:ss");
+
+                    qDebug() << "=======================";
+
+                    if(!selectedIndexes.isEmpty())
+                    {
+
+                        m_db->setPortiqueBID(selectedIndexes[0].data().value<int>(), id);
+
+                        m_db->setDepartTimeParticipant(selectedIndexes[0].data().value<int>(), QDateTime::currentDateTime());
+                        QMessageBox::information(this, "Portique", "Départ du dossard: #" + id + " !");
+                    } else {
+                        QMessageBox::warning(this, "Portique", "Vous n'avez pas selectionné le participant !");
+                    }
+
+                    ui.portiqueButton->setEnabled(true);
+
+
+                }
+            } if(RaceManager::getInstance()->getMode() == RaceManager::DATA)
+            {
+
+                if(!ui.portiqueButton->isEnabled())
+                {
+                    QString id = "";
+                    for(int i = 7; i < data.length(); i++)
+                    {
+                        id += data[i];
+
+                    }
+                    id.replace("\r\n", "");
+
+                    qDebug() << "======== PORTIQUE ========";
+                    qDebug() << "Mode: DATA";
+                    qDebug() << "Dossard ID:" << id << "Timestamp: " <<  QDateTime::currentSecsSinceEpoch();
+                    qDebug() << "ARRIVE : " << QDateTime::fromSecsSinceEpoch(QDateTime::currentSecsSinceEpoch()).toLocalTime().toString("yyyy/MM/dd hh:mm:ss");
+                    qDebug() << "=======================";
+
+
+                    ui.portiqueButton->setEnabled(true);
+                }
 
             }
-            id.replace("\r\n", "");
-
-            qDebug() << id << QDateTime::currentSecsSinceEpoch();
-            ui.razButton->setEnabled(true);
-
-
         }
     }
 }
 
 
-void GestionParticipant::razGetData(QByteArray data)
-{
-    qDebug() << data;
-    qDebug() << "getter";
-}
 
-void GestionParticipant::finishedRead()
-{
-    if(!ui.razButton->isEnabled())
-    {
-        ui.razButton->setEnabled(true);
-    }
-}
-
-void GestionParticipant::on_razButton_clicked()
+void GestionParticipant::on_portiqueButton_clicked()
 {
     //Recuperer toutes les valeurs situes dans le tableau et récuperer seulement la ligne selectionner pour pouvoir récuperer les valeur de cette ligne.
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
-    qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
 
-    if(ui.razButton->isEnabled())
+    if(!selectedIndexes.isEmpty())
     {
-         ui.razButton->setEnabled(false);
+        qDebug() << selectedIndexes[0].data(); //Afficher l'id du récuperation de l'id du participant (Test debug pour afficher l'id supprimer)
 
+        if(ui.portiqueButton->isEnabled())
+        {
+             ui.portiqueButton->setEnabled(false);
+
+        }
+    } else {
+       QMessageBox::warning(this, "Selection", "Aucune selection n'a été éffectuer !");
     }
-
 }
+
+void GestionParticipant::on_doigtButton_clicked()
+{
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+    if(!selectedIndexes.isEmpty())
+    {
+        if(ui.doigtButton->isEnabled())
+        {
+            ui.doigtButton->setEnabled(false);
+        }
+    } else {
+      QMessageBox::warning(this, "Lecteur", "Vous n'avez pas selectionné le participant !");
+      }
+}
+
 
 
 /////////////////////// PARTIE SIMULATION ////////////////////////////////////////////
@@ -371,84 +543,201 @@ void GestionParticipant::on_razButton_clicked()
 
 void GestionParticipant::on_razSimButton_clicked()
 {
-     RaceManager::getInstance()->setMode(RaceManager::RAZ);
 
      QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
 
-     if(!m_db->isFingerExist(selectedIndexes[0].data().value<int>()) && !m_db->isPortiqueBIDExist(selectedIndexes[0].data().value<int>()))
+     if(!selectedIndexes.isEmpty())
      {
 
-         QJsonObject obj = this->sim_config->getAll();
+         RaceManager::getInstance()->setMode(RaceManager::RAZ);
 
-         QJsonValueRef m_values = obj.find(QString::number(this->participantSimId++)).value();
-         //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
-         QJsonObject m_obj_values = m_values.toObject();
+         if(!m_db->isFingerExist(selectedIndexes[0].data().value<int>()) && !m_db->isPortiqueBIDExist(selectedIndexes[0].data().value<int>()))
+         {
+
+             QJsonObject obj = this->sim_config->getAll();
+
+             QJsonValueRef m_values = obj.find(QString::number(this->participantSimId++)).value();
+
+             for(QString &key : obj.keys())
+             {
+                 QJsonObject m_obj = obj.find(key)->toObject();
+
+                // if(m_obj.value(""))
+
+             }
 
 
-         QVariant fingerId = m_obj_values.value("finger_id").toVariant();
-         QVariant bidId = m_obj_values.value("passage_id").toVariant();
-
-         qDebug() << fingerId << bidId;
-
-         //int passage_start = m_obj_values.value("passage_start").toInt();
-
-         m_db->setFinger(selectedIndexes[0].data().value<int>(), fingerId.toLongLong());
-         m_db->setPortiqueBID(selectedIndexes[0].data().value<int>(), bidId.toLongLong());
+             //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+             QJsonObject m_obj_values = m_values.toObject();
 
 
-         //qDebug() << m_db->getParticipantData(selectedIndexes[0].data().value<int>());
+             QVariant fingerId = m_obj_values.value("finger_id").toVariant();
+             QVariant bidId = m_obj_values.value("bid_id").toVariant();
 
-         QMessageBox::information(this, "Participant", "le participant à bien démarré la course !");
-     } else {
-          QMessageBox::warning(this, "RAZ", "Ce participant possède déjà un numéro inscrit sur le RFID ainsi que sur le doigt");
+             qDebug() << fingerId << bidId;
+
+             //int passage_start = m_obj_values.value("passage_start").toInt();
+
+
+             //MODE RAZ (attribuer l'id du dossard et l'id du doigt(badge RFID)
+
+             m_db->setFinger(selectedIndexes[0].data().value<int>(), fingerId.toString());
+             m_db->setPortiqueBID(selectedIndexes[0].data().value<int>(), bidId.toString());
+
+
+             //qDebug() << m_db->getParticipantData(selectedIndexes[0].data().value<int>());
+
+
+             QSqlQuery q = m_db->getDb().exec();
+             q.prepare("SELECT bid FROM participant_races WHERE participant_id=?");
+             q.addBindValue(selectedIndexes[0].data().value<int>());
+             q.exec();
+             while(q.next())
+             {
+                 QString bid = q.value(0).toString();
+                 QMessageBox::information(this, "Depart", "le participant du dossard #" + bid + " à bien démarré la course !");
+             }
+
+         } else {
+              QMessageBox::warning(this, "RAZ", "Ce participant possède déjà un numéro de dossard inscrit ainsi que sur l'identifiant du doigt(Badge RFID)");
+
+         }
+     } else
+     {
+        QMessageBox::warning(this, "Selection", "Aucune selection n'a été éffectuer !");
      }
 }
 
 
+
 void GestionParticipant::on_dataSimButton_clicked()
 {
-    RaceManager::getInstance()->setMode(RaceManager::DATA);
-
 
     QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
 
-    if(m_db->isFingerExist(selectedIndexes[0].data().value<int>()) && m_db->isPortiqueBIDExist(selectedIndexes[0].data().value<int>()))
+    if(!selectedIndexes.isEmpty())
     {
 
-        QJsonObject obj = this->sim_config->getAll();
+        RaceManager::getInstance()->setMode(RaceManager::DATA);
 
 
-        QSqlQuery q = m_db->getDb().exec();
-
-        q.prepare("SELECT finger FROM participant_races WHERE participant_id=?");
-        q.addBindValue(selectedIndexes[0].data().value<int>());
-        qDebug() << q.exec();
-
-        while(q.next())
+        if(m_db->isFingerExist(selectedIndexes[0].data().value<int>()) && m_db->isPortiqueBIDExist(selectedIndexes[0].data().value<int>()))
         {
-            //qDebug() << q.value(0);
+
+            QJsonObject obj = this->sim_config->getAll();
 
 
-            for(int i = 1; i < 5; i++)
+            QSqlQuery q = m_db->getDb().exec();
+
+            q.prepare("SELECT finger FROM participant_races WHERE participant_id=?");
+            q.addBindValue(selectedIndexes[0].data().value<int>());
+            qDebug() << q.exec();
+
+            while(q.next())
             {
 
-               QJsonValueRef m_values = obj.find(QString::number(i)).value();
+                for(int i = 1; i < 5; i++)
+                {
 
 
-               //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
-               QJsonObject m_obj_values = m_values.toObject();
+                   QJsonValueRef m_values = obj.find(QString::number(i)).value();
 
 
-               if(m_obj_values.value("finger_id").toVariant().toLongLong() == q.value(0).toLongLong())  //Trouver les données (JsonObject) du participantà l'aide de l'id du doigt(RFID)
-               {
-                   qDebug() << m_obj_values;
+                   //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+                   QJsonObject m_obj_values = m_values.toObject();
 
+                   //////////// TROUVER L'ID DU BADGE DU COUREUR ASSOCIER LORS DU MODE RAZ AVEC CELUI ENREGISTRER DANS LA BASE DE DONNEES POUR POUVOIR TRAITER LA BONNE DONNEES ////
+
+                   if(m_obj_values.value("finger_id").toVariant().toLongLong() == q.value(0).toLongLong())  //Trouver les données (JsonObject) du participant à l'aide de l'id du doigt(RFID)
+                   {
+                       //qDebug() << m_obj_values;
+
+                       /////////////////////////// PARTIE ENREGISTREMENT DES PASSAGES AU BALISES DANS LA BASE DE DONNEES /////////////////////////////////////
+                       QJsonObject passages = m_obj_values.find("data")->toObject();
+
+                       for(QString const &key : passages.keys())
+                       {
+                            QJsonObject passage_obj = passages.find(key)->toObject();
+                            if(!m_db->hasParticipantCheckpoint(passage_obj.value("order_id").toInt(), RaceManager::getInstance()->getRaceId(), selectedIndexes[0].data().value<int>()))
+                            {
+
+                                m_db->addParticipantCheckpoint(passage_obj.value("altitude").toString(), passage_obj.value("longitude").toString(),
+                                                               passage_obj.value("attitude").toString(), RaceManager::getInstance()->getRaceId(),
+                                                               selectedIndexes[0].data().value<int>(),
+                                        passage_obj.value("order_id").toInt(), passage_obj.value("points").toInt());
+                            }
+                       }
+
+                       //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+                       //// PARTIE TRAITEMENT DE DONNEES APRES QUE LE COUREUR EST FINIT LA COURSE /////
+
+                       int start = m_obj_values.value("bid_start").toInt();
+                       int end = m_obj_values.value("bid_end").toInt();
+                       float duration = (end - start) / 60; //convertir le timestamp de seconde en minute.
+
+                       QSqlQuery q = m_db->getDb().exec();
+                       q.prepare("SELECT bid FROM participant_races WHERE participant_id=?");
+                       q.addBindValue(selectedIndexes[0].data().value<int>());
+                       q.exec();
+                       while(q.next())
+                       {
+                           QString bid = q.value(0).toString();
+                           QMessageBox::information(this, "Arrivée", "Dossard: #" + bid + " Durée: " + QString::number(duration) + " minute(s) !");
+                       }
+
+
+                       //ENREGISTREMENT DATA
+
+
+                   }
                }
-               //int passageId = m_obj_values.value("passage_id").toInt();
-               //int passage_start = m_obj_values.value("passage_start").toInt();
-           }
+            }
         }
+    } else {
+       QMessageBox::warning(this, "Selection", "Aucune selection n'a été éffectuer !");
     }
+}
+
+
+int GestionParticipant::getNewParticipantId()
+{
+    int newId = -1; // cas d'erreur
+
+    QModelIndexList selectedIndexes = ui.participantTable->selectionModel()->selectedIndexes();
+
+    QJsonObject obj = this->sim_config->getAll();
+
+
+    QSqlQuery q = m_db->getDb().exec();
+
+    q.prepare("SELECT finger FROM participant_races WHERE participant_id=?");
+    q.addBindValue(selectedIndexes[0].data().value<int>());
+    qDebug() << q.exec();
+
+    while(q.next())
+    {
+
+        for(int i = 1; i < 5; i++)
+        {
+
+
+           QJsonValueRef m_values = obj.find(QString::number(i)).value();
+
+
+           //transformer en objet pour permettre la récuperation des sous clée de la clé principal de "base_de_données"
+           QJsonObject m_obj_values = m_values.toObject();
+
+           //////////// TROUVER L'ID DU BADGE DU COUREUR ASSOCIER LORS DU MODE RAZ AVEC CELUI ENREGISTRER DANS LA BASE DE DONNEES POUR POUVOIR TRAITER LA BONNE DONNEES ////
+
+           if(m_obj_values.value("finger_id").toVariant().toLongLong() == q.value(0).toLongLong())  //Trouver les données (JsonObject) du participant à l'aide de l'id du doigt(RFID)
+           {
+            }
+        }
+
+       }
+    return newId;
 }
 
 

@@ -2,30 +2,45 @@
 #include "racemanager.h"
 #include <QMessageBox>
 #include <QApplication>
+#include <QDateTime>
 
 DatabaseManager::DatabaseManager()
 {
 
 }
 
-
+///
+/// \brief DatabaseManager::~DatabaseManager
+///
 DatabaseManager::~DatabaseManager()
 {
     m_db.commit();
     m_db.close();
 }
 
+///
+/// \brief DatabaseManager::setDb
+/// \param m_db
+///
 void DatabaseManager::setDb(QSqlDatabase m_db)
 {
     this->m_db = m_db;
 
 }
 
+///
+/// \brief DatabaseManager::getDb
+/// \return
+///
 QSqlDatabase DatabaseManager::getDb()
 {
     return this->m_db;
 }
 
+///
+/// \brief DatabaseManager::initDb
+/// \return
+///
 QSqlError DatabaseManager::initDb()
 {
     QSqlDatabase db;
@@ -47,8 +62,6 @@ QSqlError DatabaseManager::initDb()
         return q.lastError();
     if (!q.exec(CHECKPOINTS_SQL))
         return q.lastError();
-    if (!q.exec(ARRIVALS_SQL))
-        return q.lastError();
     if(!q.exec(PARTICIPANTS_RACES_DATA_SQL))
        return q.lastError();
 
@@ -61,7 +74,11 @@ QSqlError DatabaseManager::initDb()
     return QSqlError();
 }
 
-
+///
+/// \brief DatabaseManager::initDb
+/// \param connectionName
+/// \return
+///
 QSqlError DatabaseManager::initDb(QString &connectionName)
 {
     QSqlDatabase db;
@@ -83,8 +100,6 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
         return q.lastError();
     if (!q.exec(CHECKPOINTS_SQL))
         return q.lastError();
-    if (!q.exec(ARRIVALS_SQL))
-        return q.lastError();
     if(!q.exec(PARTICIPANTS_RACES_DATA_SQL))
        return q.lastError();
 
@@ -97,6 +112,14 @@ QSqlError DatabaseManager::initDb(QString &connectionName)
     return QSqlError();
 }
 
+
+/////// PARTIE Participant //////////////////
+
+///
+/// \brief DatabaseManager::isParticipantExist
+/// \param mail
+/// \return
+///
 bool DatabaseManager::isParticipantExist(const QString &mail)
 {
      QSqlQuery q;
@@ -115,7 +138,11 @@ bool DatabaseManager::isParticipantExist(const QString &mail)
      return  (recCount > 0);
 }
 
-
+///
+/// \brief DatabaseManager::isParticipantRaceExist
+/// \param participantId
+/// \return
+///
 bool DatabaseManager::isParticipantRaceExist(int participantId)
 {
      QSqlQuery q;
@@ -137,6 +164,15 @@ bool DatabaseManager::isParticipantRaceExist(int participantId)
 
 
 //Ajouter un participant dans la table participants
+///
+/// \brief DatabaseManager::addParticipant
+/// \param lastname
+/// \param firstname
+/// \param mail
+/// \param password
+/// \param year
+/// \param genreId
+///
 void DatabaseManager::addParticipant(const QString &lastname, const QString &firstname,
                                      const QString &mail,
                                      const QString &password,
@@ -157,6 +193,16 @@ void DatabaseManager::addParticipant(const QString &lastname, const QString &fir
 }
 
 //Ajouter un participant dans la table participant et récupérer l'id du participant pour l'insérer dans participant_race
+
+///
+/// \brief DatabaseManager::addParticipantRace
+/// \param lastname
+/// \param firstname
+/// \param mail
+/// \param password
+/// \param year
+/// \param genreId
+///
 void DatabaseManager::addParticipantRace(const QString &lastname, const QString &firstname,
                                           const QString &mail,
                                           const QString &password,
@@ -191,6 +237,12 @@ int DatabaseManager::getParticipantData(QString email)
 
 }
 */
+
+///
+/// \brief DatabaseManager::addParticipantRace
+/// \param participantId
+/// \param raceId
+///
 void DatabaseManager::addParticipantRace(int participantId, int raceId)
 {
     QSqlQuery q;
@@ -202,6 +254,11 @@ void DatabaseManager::addParticipantRace(int participantId, int raceId)
 
 }
 
+///
+/// \brief DatabaseManager::getParticipantData
+/// \param participantId
+/// \return
+///
 QList<QVariant> DatabaseManager::getParticipantData(int participantId)
 {
     QSqlQuery q;
@@ -221,6 +278,112 @@ QList<QVariant> DatabaseManager::getParticipantData(int participantId)
     return data;
 }
 
+
+bool DatabaseManager::hasParticipantRaceData(int participantId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("SELECT * FROM participant_races_data WHERE participant_id=? and race_id=?");
+    q.addBindValue(participantId);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    if(q.exec())
+    {
+       return q.next();
+    }
+    int recCount = 0;
+    while(q.next())
+    {
+     recCount++;
+    }
+    return  (recCount > 0);
+
+}
+
+void DatabaseManager::addParticipantRaceData(int participantId, int beacons, int points)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare(INSERT_PARTICIPANT_DATA_RACE_SQL);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.addBindValue(participantId);
+    q.addBindValue(beacons);
+    q.addBindValue(points);
+    q.exec();
+
+}
+
+
+void DatabaseManager::setPartipantPoints(int participantId, int points)
+{
+    if(!this->hasParticipantRaceData(participantId))
+    {
+        this->addParticipantRaceData(participantId, 0, 0);
+    }
+
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("UPDATE participant_races_data SET points=? WHERE race_id=? and participant_id=?");
+    q.addBindValue(points);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.addBindValue(participantId);
+    qDebug() << q.exec();
+}
+
+void DatabaseManager::setPartipantBeacons(int participantId, int beacons)
+{
+    if(!this->hasParticipantRaceData(participantId))
+    {
+        this->addParticipantRaceData(participantId, 0, 0);
+    }
+
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("UPDATE participant_races_data SET beacons=? WHERE race_id=? and participant_id=?");
+    q.addBindValue(beacons);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.addBindValue(participantId);
+    q.exec();
+}
+
+
+void DatabaseManager::setDepartTimeParticipant(int participantId, QDateTime startTime)
+{
+
+    if(!this->hasParticipantRaceData(participantId))
+    {
+        this->addParticipantRaceData(participantId, 0, 0);
+    }
+
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("UPDATE participant_races_data SET start=? WHERE race_id=? and participant_id=?");
+    q.addBindValue(startTime);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.addBindValue(participantId);
+    q.exec();
+}
+void DatabaseManager::setFinishTimeParticipant(int participantId, QDateTime endTime)
+{
+    if(!this->hasParticipantRaceData(participantId))
+    {
+        this->addParticipantRaceData(participantId, 0, 0);
+    }
+
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare("UPDATE participant_races_data SET end=? WHERE race_id=? and participant_id=?");
+    q.addBindValue(endTime);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
+    q.addBindValue(participantId);
+    q.exec();
+}
+
+
+///
+/// \brief DatabaseManager::isFingerExist
+/// \param participantId
+/// \return
+///
 bool DatabaseManager::isFingerExist(int participantId)
 {
     QSqlQuery q;
@@ -239,8 +402,12 @@ bool DatabaseManager::isFingerExist(int participantId)
     return  (recCount > 0);
 }
 
-
-void DatabaseManager::setFinger(int participantId, qlonglong fingerId)
+///
+/// \brief DatabaseManager::setFinger
+/// \param participantId
+/// \param fingerId
+///
+void DatabaseManager::setFinger(int participantId, QString fingerId)
 {
     QSqlQuery q;
     q = m_db.exec();
@@ -252,13 +419,18 @@ void DatabaseManager::setFinger(int participantId, qlonglong fingerId)
 }
 
 
-
+///
+/// \brief DatabaseManager::isPortiqueBIDExist
+/// \param participantId
+/// \return
+///
 bool DatabaseManager::isPortiqueBIDExist(int participantId)
 {
     QSqlQuery q;
     q = m_db.exec();
-    q.prepare("SELECT * FROM participant_races WHERE participant_id=? and rfid IS NOT NULL");
+    q.prepare("SELECT * FROM participant_races WHERE participant_id=? and race_id=? and bid IS NOT NULL");
     q.addBindValue(participantId);
+    q.addBindValue(RaceManager::getInstance()->getRaceId());
     if(q.exec())
     {
        return q.next();
@@ -271,18 +443,26 @@ bool DatabaseManager::isPortiqueBIDExist(int participantId)
     return  (recCount > 0);
 }
 
-void DatabaseManager::setPortiqueBID(int participantId, qlonglong bid)
+///
+/// \brief DatabaseManager::setPortiqueBID
+/// \param participantId
+/// \param bid
+///
+void DatabaseManager::setPortiqueBID(int participantId, QString bid)
 {
     QSqlQuery q;
     q = m_db.exec();
-    q.prepare("UPDATE participant_races SET rfid=? WHERE participant_id=? and race_id=?");
+    q.prepare("UPDATE participant_races SET bid=? WHERE participant_id=? and race_id=?");
     q.addBindValue(bid);
     q.addBindValue(participantId);
     q.addBindValue(RaceManager::getInstance()->getRaceId());
     q.exec();
 }
 
-
+///
+/// \brief DatabaseManager::insertGenreIfNotExist
+/// \param sexe
+///
 void DatabaseManager::insertGenreIfNotExist(const QString &sexe)
 {
     QSqlQuery q;
@@ -299,6 +479,10 @@ void DatabaseManager::insertGenreIfNotExist(const QString &sexe)
     }
 }
 
+///
+/// \brief DatabaseManager::removeParticipant
+/// \param id
+///
 void DatabaseManager::removeParticipant(const int id)
 {
     QSqlQuery q;
@@ -320,6 +504,11 @@ void DatabaseManager::removeParticipant(const int id)
 
 ////////////////////////////////////////////////////////////////////////////PART RACE
 
+///
+/// \brief DatabaseManager::isRaceExist
+/// \param raceName
+/// \return
+///
 bool DatabaseManager::isRaceExist(const QString &raceName)
 {
      QSqlQuery q;
@@ -338,6 +527,19 @@ bool DatabaseManager::isRaceExist(const QString &raceName)
      return  (recCount > 0);
 }
 
+///
+/// \brief DatabaseManager::addRace
+/// \param race_id
+/// \param id_department
+/// \param name
+/// \param date
+/// \param location
+/// \param gps_longitude
+/// \param gps_latitude
+/// \param difficulty
+/// \param type
+/// \param book
+///
 void DatabaseManager::addRace(int race_id, int id_department, QString name, QDateTime date, QString location,
                               QString gps_longitude, QString gps_latitude, int difficulty, int type, int book)
 {
@@ -358,3 +560,60 @@ void DatabaseManager::addRace(int race_id, int id_department, QString name, QDat
 
       qDebug() << q.exec();
 }
+
+///
+/// \brief DatabaseManager::addParticipantCheckpoint
+/// \param altitude
+/// \param longitude
+/// \param attitude
+/// \param raceId
+/// \param participantId
+/// \param orderId
+/// \param points
+///
+void DatabaseManager::addParticipantCheckpoint(QString altitude, QString longitude, QString attitude, int raceId, int participantId, int orderId, int points)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare(INSERT_CHECKPOINT_SQL);
+
+    q.addBindValue(altitude);
+    q.addBindValue(longitude);
+    q.addBindValue(attitude);
+    q.addBindValue(raceId);
+    q.addBindValue(participantId);
+    q.addBindValue(orderId);
+    q.addBindValue(points);
+    qDebug() << q.exec();
+
+}
+
+
+///
+/// \brief DatabaseManager::hasParticipantCheckpoint
+/// \param orderId
+/// \param raceId
+/// \param participantId
+/// \return
+///
+bool DatabaseManager::hasParticipantCheckpoint(int orderId, int raceId, int participantId)
+{
+    QSqlQuery q;
+    q = m_db.exec();
+    q.prepare(SELECT_ORDER_CHECKPOINT_PARTICIPANT);
+    q.addBindValue(orderId);
+    q.addBindValue(raceId);
+    q.addBindValue(participantId);
+
+    if(q.exec())
+    {
+       return q.next();
+    }
+    int recCount = 0;
+    while(q.next())
+    {
+     recCount++;
+    }
+    return  (recCount > 0);
+}
+

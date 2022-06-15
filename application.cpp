@@ -7,6 +7,7 @@
 #include <mysqldata.cpp>
 #include <QFileInfo>
 #include <racemanager.h>
+#include <QDateTime>
 
 void Application::init()
 {
@@ -76,13 +77,6 @@ void Application::init()
 
     this->config_form->init(m_mydb);
 
-
-
-    //Config Base de données
-   // this->config_form = new ConfigForm(m_mydb);
-
-
-    //Initialisation des courses.
     initRaces();
 
 }
@@ -169,8 +163,8 @@ void Application::initRaces()
     comboLists.insert(0, "-");
     for(const struct RaceManager::Race &r : races)
     {
-        i++;
-        ui->comboBox->addItem(r.date + " "+ r.name);
+        i++;      
+        ui->comboBox->addItem(QDateTime::fromString(r.date, Qt::ISODate).toLocalTime().toString("yyyy/MM/dd hh:mm:ss") + " "+ r.name);
         comboLists.insert(i, r.date);
         // Remplir le tableau avec les id des races
     }
@@ -216,18 +210,23 @@ void Application::on_actionBddConfig_triggered()
 
 void Application::on_actionExporter_triggered()
 {
-    if(m_sqlite->exportSql())
+    if(RaceManager::getInstance()->isRaceSelected())
     {
-        ///
-        /// \brief QMessageBox::information
-        ///
-        ///
-         QMessageBox::information(this, "Exportation", "L'exportation des données des participants on été envoyée au serveur web !");
+        if(m_mydb->exportData())
+        {
+            ///
+            /// \brief QMessageBox::information
+            ///
+            ///
+             QMessageBox::information(this, "Exportation", "L'exportation des données des participants on été envoyée au serveur web !");
 
 
 
+        } else {
+             QMessageBox::warning(this, "Exportation", "Erreur lors de l'exportation des données vérifier la base de données du serveur web !");
+        }
     } else {
-         QMessageBox::warning(this, "Exportation", "Erreur lors de l'exportation des données vérifier la base de données du serveur web !");
+         QMessageBox::warning(this, "Inscription", "Vous devez selectionner une course pour pouvoir effectuer cette action !");
     }
 }
 
@@ -301,4 +300,29 @@ void Application::on_actionQuitter_2_triggered()
 }
 
 
+
+
+void Application::on_actionReinitialiser_les_donn_es_triggered()
+{
+    if(RaceManager::getInstance()->isRaceSelected())
+    {
+
+        QSqlQuery q = m_db->getDb().exec();
+
+        //suppression des lignes de la base de données local de chaque tables correspondant a la course selectionné
+        q.prepare("DELETE FROM TABLE participant_races WHERE race_id=?");
+        q.addBindValue(RaceManager::getInstance()->getRaceId());
+        q.exec();
+        q.exec("DELETE FROM TABLE participant_races_data WHERE race_id=?");
+        q.addBindValue(RaceManager::getInstance()->getRaceId());
+        q.exec();
+        q.exec("DELETE FROM TABLE checkpoints WHERE race_id=?");
+        q.addBindValue(RaceManager::getInstance()->getRaceId());
+        q.exec();
+
+        QMessageBox::information(this, "Reinitialisation", "Vous avez reinitiliser la course avec succès !");
+    } else {
+         QMessageBox::warning(this, "Reinitialisation", "Vous devez selectionner une course pour pouvoir supprimer les données d'une course !");
+    }
+}
 

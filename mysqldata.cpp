@@ -9,6 +9,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <databasemanager.h>
+#include "racemanager.h"
 
 class MySQLData {
 
@@ -202,6 +203,70 @@ void exportSql(QString filePath)
     dumpProcess.setStandardOutputFile(filePath);
     dumpProcess.start("mysqldump", args); //mysqldump requis !!!!!! dans l'environnement
     dumpProcess.waitForFinished(); //Attendre que le processus soit entirement finit.
+}
+
+bool exportData()
+{
+
+      QString connectionName;
+      connectionName = "myExportNewDb";
+      DatabaseManager *m_db_saver = new DatabaseManager();
+      if(m_db_saver->getDb().connectionNames().contains(connectionName)){
+          m_db_saver->getDb().removeDatabase(connectionName);
+      }
+      QSqlError err = m_db_saver->initDb(connectionName);
+
+      QSqlQuery queryLocal = m_db_saver->getDb().exec();
+      queryLocal.prepare("SELECT * FROM participant_races_data WHERE race_id=?");
+      queryLocal.addBindValue(RaceManager::getInstance()->getRaceId());
+      qDebug() << queryLocal.exec();
+
+      while(queryLocal.next())
+      {
+
+
+          if (m_db->open())
+          {
+
+              qDebug() << RaceManager::getInstance()->getRaceId() << queryLocal.value(1) << queryLocal.value(2) << queryLocal.value(3) << queryLocal.value(4) << queryLocal.value(5);
+
+              QSqlQuery query;
+              query = m_db->exec();
+              query.prepare(QString("INSERT INTO leaderboard_races (race_id, participant_id, beacons, start_time, end_time, points) "
+                                    "values(?, ?, ?, ?, ?, ?)"));
+
+              //id course actuelle
+              query.addBindValue(RaceManager::getInstance()->getRaceId());
+
+              //id participant
+              query.addBindValue(queryLocal.value(1));
+
+              //nombre de balises
+              query.addBindValue(queryLocal.value(2));
+
+              //start time
+              query.addBindValue(queryLocal.value(4));
+
+              //end time
+              query.addBindValue(queryLocal.value(5));
+
+              //points
+              query.addBindValue(queryLocal.value(3));
+
+              if (!query.exec())
+              {
+                  qDebug() << query.lastError();
+                  return false;
+              }
+
+          } else {
+              qDebug() << "MySQL NOT OPEN (MySQLData #249)";
+              return false;
+          }
+      }
+
+
+      return true;
 }
 
 QMap<QString, QString> SqlDataToMap()

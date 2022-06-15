@@ -20,24 +20,33 @@ public:
      GestionParticipant(DatabaseManager *db);
     ~GestionParticipant();
     void createTableView();
+    int getNewParticipantId();
+
 private slots:
     void on_suprButton_clicked();
 
     void on_updateButton_clicked();
 
-    void on_razButton_clicked();
-
-    void razGetData(QByteArray);
-
-    void finishedRead();
+    //void on_razButton_clicked();
 
     void serialReceived();
 
    // void on_pushButton_clicked();
 
+    void on_portiqueButton_clicked();
+
     void on_razSimButton_clicked();
 
     void on_dataSimButton_clicked();
+
+    void on_doigtButton_clicked();
+
+    //emettre le slot lorsque le signal getCardId est appelé via le serveur
+    void getCardId(QString);
+
+    //emettre le slot lorsque le signal getResultDataParticipant est appelé pour l'arrive du participant
+    void getResultDataParticipant(QString, int, int);
+
 
 private:
     Ui::GestionParticipant ui;

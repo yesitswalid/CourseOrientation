@@ -26,7 +26,8 @@ SOURCES += \
     application.cpp \
     mysqldata.cpp \
     portique.cpp \
-    racemanager.cpp
+    racemanager.cpp \
+    server.cpp
 
 HEADERS += \
     application.h \

@@ -15,6 +15,8 @@ public:
      GestionPortique();
     ~GestionPortique();
 
+     QString getModeToString();
+
 private slots:
      void on_razButton_clicked();
 

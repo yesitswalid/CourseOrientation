@@ -53,44 +53,18 @@
     </item>
    </layout>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QLabel" name="modeLabel">
    <property name="geometry">
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>63</width>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>MODE:</string>
    </property>
-  </widget>
-  <widget class="QWidget" name="gridLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>260</y>
-     <width>371</width>
-     <height>80</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QPushButton" name="pushButton_4">
-      <property name="text">
-       <string>Start Serveur</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QPushButton" name="pushButton_5">
-      <property name="text">
-       <string>Stop Serveur</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
   </widget>
  </widget>
  <resources/>

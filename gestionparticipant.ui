@@ -138,52 +138,23 @@
            <widget class="QLineEdit" name="dateEdit"/>
           </item>
           <item row="8" column="0">
-           <widget class="QLabel" name="label">
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>RFID</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLineEdit" name="rfidEdit"/>
-          </item>
-          <item row="12" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Mode</string>
-            </property>
-           </widget>
-          </item>
-          <item row="13" column="0">
-           <widget class="QPushButton" name="razButton">
-            <property name="text">
-             <string>RAZ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
-           <widget class="QPushButton" name="razSimButton">
-            <property name="text">
-             <string>RAZ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Simulation</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="1">
-           <widget class="QPushButton" name="suprButton">
+          <item row="9" column="0">
+           <widget class="QPushButton" name="razSimButton">
             <property name="text">
-             <string>Supprimer</string>
+             <string>RAZ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QPushButton" name="dataSimButton">
+            <property name="text">
+             <string>DATA</string>
             </property>
            </widget>
           </item>
@@ -195,9 +166,30 @@
            </widget>
           </item>
           <item row="11" column="0">
-           <widget class="QPushButton" name="dataSimButton">
+           <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>DATA</string>
+             <string>Activation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0">
+           <widget class="QPushButton" name="portiqueButton">
+            <property name="text">
+             <string>Portique</string>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="1">
+           <widget class="QPushButton" name="suprButton">
+            <property name="text">
+             <string>Supprimer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="0">
+           <widget class="QPushButton" name="doigtButton">
+            <property name="text">
+             <string>Doigt</string>
             </property>
            </widget>
           </item>

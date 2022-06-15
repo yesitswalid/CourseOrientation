@@ -2,8 +2,7 @@
 #include <QApplication>
 #include <QString>
 #include <server.h>
-
-#include "portique.h"
+//#include "portique.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +11,7 @@ int main(int argc, char *argv[])
     w.show();
 
     //Initialisation du serveur pour la communication du portique
-    new Server();
+    Server::getInstance()->init();
 
     /*
     QThread *t = new QThread();
@@ -23,7 +22,6 @@ int main(int argc, char *argv[])
     qDebug() << "Test: " << t->thread()->currentThread();
     qDebug() << "thread Principal:" << QThread::currentThread() << " :" << __LINE__ ;
     */
-
 
     return a.exec();
 }
