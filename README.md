@@ -7,7 +7,7 @@ L'application fonctionne en multi-plateforme tel que Linux et Windows.
 Libraries necessaires pour la fonctionnalité de l'application les pilotes (drivers) QMySQL, QSQLite pour la gestion de données
 Ainsi que le port de série QSerialPort.
 
-![Ibb Image](https://ibb.co/2n0vvmy)
+![Ibb Image](https://i.ibb.co/mDr991G/IHM.png)
 
 
 # La description en Francais
