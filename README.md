@@ -1,6 +1,11 @@
 # CourseOrientation
-Project made for school
 
+Application Project made for school
+
+L'application fonctionne en multi-plateforme tel que Linux et Windows.
+
+Libraries necessaires pour la fonctionnalité de l'application les pilotes (drivers) QMySQL, QSQLite pour la gestion de données
+Ainsi que le port de série QSerialPort.
 
 # La description en Francais
 
@@ -38,3 +43,5 @@ this information will then be stored in a local database type SQLite on the side
 When the race finishes the data in the local database on the PC Organizer side will be processed and all the information uploaded to the website which has a MySQL type database. 
 
 The organizer of the site will process this data and will have to establish a classification as well as the statistics of the participants.
+
+Project work in cross platform not only Linux and windows include.
