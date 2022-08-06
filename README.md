@@ -7,6 +7,10 @@ L'application fonctionne en multi-plateforme tel que Linux et Windows.
 Libraries necessaires pour la fonctionnalité de l'application les pilotes (drivers) QMySQL, QSQLite pour la gestion de données
 Ainsi que le port de série QSerialPort.
 
+
+[[/https://ibb.co/2n0vvmy|IHM]]
+
+
 # La description en Francais
 
 Le but du projet consiste à développer une solution pour fournir au club de course d'orientation une solution aux compétiteurs un moyen de se pré-inscrire à la compétition, 
