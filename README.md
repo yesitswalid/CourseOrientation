@@ -1,6 +1,6 @@
 # CourseOrientation
 
-Application Project made for school
+Application Project made for school with framework Qt version 6
 
 L'application fonctionne en multi-plateforme tel que Linux et Windows.
 
