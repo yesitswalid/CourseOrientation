@@ -25,7 +25,13 @@
 
 static void configurerPortSerie(QSerialPort *serial)
 {
-    serial->setPortName(QString::fromLatin1(SERIAL_PORT_DEFAULT));
+    /* Le port par défaut peut être surchargé via Configuration::get("port_serie") */
+    Configuration config;
+    const QString portConfigure = config.get("port_serie").toString();
+    const QString portFinal     = portConfigure.isEmpty()
+        ? QString::fromLatin1(SERIAL_PORT_DEFAULT)
+        : portConfigure;
+    serial->setPortName(portFinal);
 
     if (!serial->setBaudRate(QSerialPort::Baud9600))
         qWarning() << "Erreur : impossible de configurer le débit à 9600 bauds";
@@ -523,4 +529,35 @@ int GestionParticipant::getNewParticipantId()
 {
     /* Non implémenté — réservé pour usage futur */
     return -1;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ *  Reconnecte le port série sur le port spécifié par l'utilisateur.
+ *  Appelé depuis GestionPortique::serialPortChanged.
+ * ────────────────────────────────────────────────────────────────────────── */
+void GestionParticipant::setSerialPort(const QString &portName)
+{
+    if (portName.isEmpty() || !serial)
+        return;
+
+    /* Fermer l'ancien port */
+    if (serial->isOpen())
+        serial->close();
+    serial->disconnect();
+
+    /* Reconfigurer avec le nouveau nom de port */
+    serial->setPortName(portName);
+    serial->setBaudRate(QSerialPort::Baud9600);
+    serial->setStopBits(QSerialPort::OneStop);
+    serial->setDataBits(QSerialPort::Data8);
+    serial->setFlowControl(QSerialPort::NoFlowControl);
+
+    if (serial->open(QIODevice::ReadOnly)) {
+        connect(serial, &QSerialPort::readyRead,
+                this, &GestionParticipant::serialReceived);
+        qDebug() << "[GestionParticipant] Port série reconnecté :" << portName;
+    } else {
+        qWarning() << "[GestionParticipant] Échec d'ouverture du port"
+                   << portName << ":" << serial->errorString();
+    }
 }

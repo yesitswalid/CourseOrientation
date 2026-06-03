@@ -22,6 +22,12 @@ public:
     void createTableView();
     int getNewParticipantId();
 
+public slots:
+    /** Reconnecte le QSerialPort sur le port spécifié.
+     *  Appelé depuis GestionPortique quand l'utilisateur change de port.
+     *  @param portName Nom système du port (ex: "COM3", "/dev/ttyUSB0"). */
+    void setSerialPort(const QString &portName);
+
 private slots:
     void on_suprButton_clicked();
 

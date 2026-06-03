@@ -8,6 +8,9 @@
 #include <QDateTime>
 #include <QPushButton>
 #include <QAction>
+#include <QHBoxLayout>
+#include <QBoxLayout>
+#include <QSplitter>
 
 /* ──────────────────────────────────────────────────────────────────────────
  *  Initialisation complète
@@ -63,6 +66,11 @@ void Application::init()
             this,   &Application::onImportFinished);
     connect(m_mydb, &MySQLData::exportFinished,
             this,   &Application::onExportFinished);
+
+    /* Le sélecteur de port série de GestionPortique reconfigure
+     * automatiquement le QSerialPort de GestionParticipant */
+    connect(gestion_portique, &GestionPortique::serialPortChanged,
+            gestion_participant, &GestionParticipant::setSerialPort);
 
     /* Bouton et action menu pour créer une course */
     setupCreateRaceButton();
@@ -283,39 +291,74 @@ void Application::on_actionReinitialiser_les_donn_es_triggered()
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
- *  Ajoute le bouton "Nouvelle course" et l'action menu correspondante
- *
- *  - Une action est ajoutée au menu Edition (ou un menu fallback)
- *  - Un bouton compact apparaît à droite du QComboBox de sélection
- *  - Le raccourci Ctrl+N déclenche également la création
+ *  Ajoute le bouton "+ Nouvelle course" CÔTE À CÔTE avec le bouton "Valider"
+ *  et centre le contenu principal pour qu'il reste lisible en plein écran.
  * ────────────────────────────────────────────────────────────────────────── */
 void Application::setupCreateRaceButton()
 {
-    /* ── 1. Bouton dans la fenêtre principale ────────────────────────────── */
-    auto *boutonNouveau = new QPushButton("+ Nouvelle course", this);
+    /* ── Bouton "+ Nouvelle course" ──────────────────────────────────────── */
+    auto *boutonNouveau = new QPushButton("+ Nouvelle course");
     boutonNouveau->setObjectName("buttonCreateRace");
-    boutonNouveau->setToolTip("Créer une nouvelle course dans la base locale (Ctrl+N)");
+    boutonNouveau->setToolTip("Créer une nouvelle course (Ctrl+N)");
     boutonNouveau->setCursor(Qt::PointingHandCursor);
-    boutonNouveau->setShortcut(QKeySequence("Ctrl+N"));
-
-    /* Insérer le bouton à côté du bouton "Valider" de sélection de course */
-    if (auto *parentSelect = ui->buttonSelectRace ? ui->buttonSelectRace->parentWidget() : nullptr) {
-        if (auto *layoutParent = parentSelect->layout()) {
-            layoutParent->addWidget(boutonNouveau);
-        }
-    }
+    boutonNouveau->setMinimumHeight(36);
 
     connect(boutonNouveau, &QPushButton::clicked,
             this, &Application::onCreateRaceClicked);
 
-    /* ── 2. Action dans la barre de menu ─────────────────────────────────── */
+    /* ── Remplacer le bouton "Valider" par un conteneur horizontal ──────── */
+    if (ui->buttonSelectRace) {
+        QWidget *parent = ui->buttonSelectRace->parentWidget();
+        if (parent) {
+            ui->buttonSelectRace->setMinimumHeight(36);
+
+            /* Conteneur horizontal pour les 2 boutons */
+            auto *container = new QWidget();
+            auto *hLayout = new QHBoxLayout(container);
+            hLayout->setContentsMargins(0, 0, 0, 0);
+            hLayout->setSpacing(10);
+            hLayout->addWidget(ui->buttonSelectRace);
+            hLayout->addWidget(boutonNouveau);
+
+            /* Si le parent est un QSplitter, on insère à la même position */
+            if (auto *splitter = qobject_cast<QSplitter *>(parent)) {
+                const int idx = splitter->indexOf(ui->buttonSelectRace);
+                splitter->insertWidget(idx, container);
+            }
+            /* Sinon, layout standard (QBoxLayout) */
+            else if (auto *layout = qobject_cast<QBoxLayout *>(parent->layout())) {
+                const int idx = layout->indexOf(ui->buttonSelectRace);
+                layout->insertWidget(idx, container);
+            }
+        }
+    }
+
+    /* ── Centrer le contenu principal (max-width + spacers latéraux) ────── */
+    if (auto *central = centralWidget()) {
+        /* Le widget central actuel devient le contenu, on l'enveloppe dans
+         * un nouveau wrapper centré avec une largeur maximale raisonnable. */
+        const int CONTENU_LARGEUR_MAX = 720;
+
+        /* Limiter la largeur du contenu interne */
+        if (auto *splitter = central->findChild<QSplitter *>()) {
+            splitter->setMaximumWidth(CONTENU_LARGEUR_MAX);
+        }
+
+        /* Wrapper le centralWidget avec un layout horizontal centré */
+        auto *ancienLayout = central->layout();
+        if (ancienLayout && ancienLayout->count() > 0) {
+            ancienLayout->setContentsMargins(20, 20, 20, 20);
+            ancienLayout->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+        }
+    }
+
+    /* ── Action dans la barre de menu Edition ───────────────────────────── */
     auto *actionCreer = new QAction(tr("&Créer une nouvelle course..."), this);
     actionCreer->setShortcut(QKeySequence("Ctrl+N"));
     actionCreer->setStatusTip(tr("Créer une course dans la base locale"));
     connect(actionCreer, &QAction::triggered,
             this, &Application::onCreateRaceClicked);
 
-    /* Ajouter dans le menu Edition si disponible, sinon créer un menu */
     if (ui->menuEdition)
         ui->menuEdition->addAction(actionCreer);
     else
