@@ -72,6 +72,31 @@ jobs:
             exit 1
           }
 
+      - name: Télécharger driver MySQL pour Qt 6.7.3 (Windows)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $dist = "dist\CourseOrientation"
+          $sqlDir = "$dist\sqldrivers"
+          New-Item -ItemType Directory -Force $sqlDir | Out-Null
+
+          # Plugin QMYSQL pré-compilé depuis le repo communautaire
+          $url = "https://github.com/thecodemonkey86/qt_mysql_driver/releases/download/v6.7.3-msvc/qsqlmysql.dll_Qt_SQL_driver_6.7.3_MSVC2019_64-Bit.zip"
+          $tmpZip = "qsqlmysql.zip"
+          try {
+            Invoke-WebRequest -Uri $url -OutFile $tmpZip -UseBasicParsing -TimeoutSec 60
+            Expand-Archive -Path $tmpZip -DestinationPath "qsqlmysql_extracted" -Force
+            # Copier qsqlmysql.dll + libmysql.dll dans le bon dossier
+            Get-ChildItem "qsqlmysql_extracted" -Recurse -Filter "qsqlmysql.dll" |
+              Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName $sqlDir }
+            Get-ChildItem "qsqlmysql_extracted" -Recurse -Filter "libmysql.dll" |
+              Select-Object -First 1 | ForEach-Object { Copy-Item $_.FullName $dist }
+            Remove-Item $tmpZip, "qsqlmysql_extracted" -Recurse -Force
+            Write-Host "Driver MySQL ajouté au packaging."
+          } catch {
+            Write-Warning "Téléchargement driver MySQL échoué — l'app fonctionnera sans QMYSQL : $_"
+          }
+
       - name: Créer l'archive ZIP
         shell: pwsh
         run: |
@@ -152,8 +177,17 @@ jobs:
           # Plugins SQL et plateforme
           mkdir -p "$DIST/plugins/sqldrivers" "$DIST/plugins/platforms" "$DIST/plugins/imageformats"
           cp "$Qt6_DIR/plugins/sqldrivers/libqsqlite.so" "$DIST/plugins/sqldrivers/" 2>/dev/null || true
+          cp "$Qt6_DIR/plugins/sqldrivers/libqsqlmysql.so" "$DIST/plugins/sqldrivers/" 2>/dev/null \
+            && echo "Driver QMYSQL inclus." \
+            || echo "Driver QMYSQL absent (l'app fonctionnera sans MySQL)."
           cp "$Qt6_DIR/plugins/platforms/libqxcb.so"     "$DIST/plugins/platforms/" 2>/dev/null || true
           cp "$Qt6_DIR/plugins/imageformats/"*.so         "$DIST/plugins/imageformats/" 2>/dev/null || true
+
+          # libmysqlclient si présent
+          MYSQL_LIB=$(ldconfig -p | grep -E "libmysqlclient\.so" | head -1 | awk '{print $NF}')
+          if [ -n "$MYSQL_LIB" ] && [ -f "$MYSQL_LIB" ]; then
+            cp "$MYSQL_LIB" "$DIST/lib/" 2>/dev/null && echo "libmysqlclient incluse."
+          fi
 
           # Bibliothèques XCB nécessaires pour libqxcb
           ldd "$Qt6_DIR/plugins/platforms/libqxcb.so" 2>/dev/null | grep -E "libxcb-cursor|libxcb-icccm|libxcb-image|libxcb-keysyms|libxcb-render|libxcb-shape|libxcb-shm|libxcb-sync|libxcb-util|libxcb-xfixes|libxcb-xinerama|libxcb-xkb" | awk '{print $3}' | sort -u | xargs -I {} cp {} "$DIST/lib/" 2>/dev/null || true

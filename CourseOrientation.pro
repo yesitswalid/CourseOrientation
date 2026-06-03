@@ -26,6 +26,7 @@ SOURCES += \
     main.cpp \
     src/ui/application.cpp \
     src/ui/configform.cpp \
+    src/ui/createracedialog.cpp \
     src/ui/gestionparticipant.cpp \
     src/ui/gestionportique.cpp \
     src/ui/inscriptionform.cpp \
@@ -46,6 +47,7 @@ SOURCES += \
 HEADERS += \
     src/ui/application.h \
     src/ui/configform.h \
+    src/ui/createracedialog.h \
     src/ui/gestionparticipant.h \
     src/ui/gestionportique.h \
     src/ui/inscriptionform.h \

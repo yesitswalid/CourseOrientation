@@ -2,9 +2,12 @@
 #include "ui_application.h"
 #include "racemanager.h"
 #include "appconfig.h"
+#include "createracedialog.h"
 #include <QMessageBox>
 #include <QSqlQuery>
 #include <QDateTime>
+#include <QPushButton>
+#include <QAction>
 
 /* ──────────────────────────────────────────────────────────────────────────
  *  Initialisation complète
@@ -60,6 +63,12 @@ void Application::init()
             this,   &Application::onImportFinished);
     connect(m_mydb, &MySQLData::exportFinished,
             this,   &Application::onExportFinished);
+
+    /* Bouton et action menu pour créer une course */
+    setupCreateRaceButton();
+
+    /* Vérifier la disponibilité du driver MySQL pour l'import/export */
+    checkMySQLDriver();
 
     initRaces();
 }
@@ -271,4 +280,85 @@ void Application::on_actionReinitialiser_les_donn_es_triggered()
 
     QMessageBox::information(this, "Réinitialisation",
                              "Données de la course réinitialisées avec succès.");
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ *  Ajoute le bouton "Nouvelle course" et l'action menu correspondante
+ *
+ *  - Une action est ajoutée au menu Edition (ou un menu fallback)
+ *  - Un bouton compact apparaît à droite du QComboBox de sélection
+ *  - Le raccourci Ctrl+N déclenche également la création
+ * ────────────────────────────────────────────────────────────────────────── */
+void Application::setupCreateRaceButton()
+{
+    /* ── 1. Bouton dans la fenêtre principale ────────────────────────────── */
+    auto *boutonNouveau = new QPushButton("+ Nouvelle course", this);
+    boutonNouveau->setObjectName("buttonCreateRace");
+    boutonNouveau->setToolTip("Créer une nouvelle course dans la base locale (Ctrl+N)");
+    boutonNouveau->setCursor(Qt::PointingHandCursor);
+    boutonNouveau->setShortcut(QKeySequence("Ctrl+N"));
+
+    /* Insérer le bouton à côté du bouton "Valider" de sélection de course */
+    if (auto *parentSelect = ui->buttonSelectRace ? ui->buttonSelectRace->parentWidget() : nullptr) {
+        if (auto *layoutParent = parentSelect->layout()) {
+            layoutParent->addWidget(boutonNouveau);
+        }
+    }
+
+    connect(boutonNouveau, &QPushButton::clicked,
+            this, &Application::onCreateRaceClicked);
+
+    /* ── 2. Action dans la barre de menu ─────────────────────────────────── */
+    auto *actionCreer = new QAction(tr("&Créer une nouvelle course..."), this);
+    actionCreer->setShortcut(QKeySequence("Ctrl+N"));
+    actionCreer->setStatusTip(tr("Créer une course dans la base locale"));
+    connect(actionCreer, &QAction::triggered,
+            this, &Application::onCreateRaceClicked);
+
+    /* Ajouter dans le menu Edition si disponible, sinon créer un menu */
+    if (ui->menuEdition)
+        ui->menuEdition->addAction(actionCreer);
+    else
+        menuBar()->addAction(actionCreer);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ *  Slot — Ouvre le dialogue de création de course
+ * ────────────────────────────────────────────────────────────────────────── */
+void Application::onCreateRaceClicked()
+{
+    auto *dlg = new CreateRaceDialog(m_db, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+
+    /* Quand une course est créée, rafraîchir la liste déroulante */
+    connect(dlg, &CreateRaceDialog::raceCreated,
+            this, &Application::initRaces);
+
+    dlg->show();
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ *  Vérifie si le driver QMYSQL est chargé. Si non, désactive les actions
+ *  d'import/export et affiche un message informatif au démarrage.
+ * ────────────────────────────────────────────────────────────────────────── */
+void Application::checkMySQLDriver()
+{
+    if (QSqlDatabase::drivers().contains("QMYSQL"))
+        return; /* Driver disponible — rien à faire */
+
+    /* Driver absent : désactiver Import/Export */
+    if (ui->actionImporter) ui->actionImporter->setEnabled(false);
+    if (ui->actionExporter) ui->actionExporter->setEnabled(false);
+
+    const QString message = tr(
+        "Le driver MySQL (QMYSQL) n'est pas disponible.\n\n"
+        "Les fonctions d'import et d'export vers le serveur MySQL "
+        "sont désactivées.\n\n"
+        "Vous pouvez néanmoins utiliser l'application normalement "
+        "avec la base locale SQLite (création de courses, inscription "
+        "des participants, suivi des courses).\n\n"
+        "Pour activer la synchronisation MySQL, consultez le README "
+        "(section « Installation du driver MySQL »).");
+
+    QMessageBox::information(this, tr("Driver MySQL absent"), message);
 }

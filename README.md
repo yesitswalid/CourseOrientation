@@ -107,6 +107,36 @@ qmake tests.pro && make
 
 ---
 
+## Installation du driver MySQL
+
+L'application fonctionne **sans MySQL** pour la gestion locale (création de courses,
+inscriptions, suivi RFID). MySQL n'est nécessaire que pour synchroniser avec un
+serveur distant via les fonctions **Import / Export**.
+
+Au démarrage, si le driver `QMYSQL` est absent, ces fonctions sont **désactivées
+automatiquement** et un message d'information s'affiche.
+
+### Windows
+
+Le driver est inclus dans les releases pré-compilées. En cas d'installation manuelle :
+
+1. Télécharger `qsqlmysql.dll` + `libmysql.dll` pour Qt 6.7.3 / MSVC2019 :
+   [thecodemonkey86/qt_mysql_driver](https://github.com/thecodemonkey86/qt_mysql_driver/releases)
+2. Placer `qsqlmysql.dll` dans `<dossier_app>/sqldrivers/`
+3. Placer `libmysql.dll` à côté de `CourseOrientation.exe`
+
+### Linux
+
+```bash
+# Ubuntu / Debian
+sudo apt-get install -y libqt6sql6-mysql libmysqlclient21
+
+# Fedora / RHEL
+sudo dnf install qt6-qtbase-mysql mariadb-connector-c
+```
+
+---
+
 ## Configuration
 
 ### Connexion MySQL

@@ -57,13 +57,24 @@ private slots:
     void onImportFinished(bool success, const QString &message);
     void onExportFinished(bool success, const QString &message);
 
+    /** Ouvre la boîte de dialogue de création d'une nouvelle course. */
+    void onCreateRaceClicked();
+
 private:
     Ui::Application   *ui;
     QVector<QString>   comboLists;
+
     void init();
     void initRaces();
     void showError(const QSqlError &err);
     void setOperationsEnabled(bool enabled);
+
+    /** Ajoute le bouton "Nouvelle course" et l'action menu correspondante. */
+    void setupCreateRaceButton();
+
+    /** Vérifie la disponibilité du driver MySQL. Affiche un avertissement et
+     *  désactive les actions Import/Export si QMYSQL n'est pas chargé. */
+    void checkMySQLDriver();
 };
 
 #endif // APPLICATION_H
