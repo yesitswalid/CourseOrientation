@@ -65,7 +65,7 @@ QSqlError DatabaseManager::initDb()
 /* ──────────────────────────────────────────────────────────────────────────
  *  Initialisation avec nom de connexion personnalisé (import/export)
  * ────────────────────────────────────────────────────────────────────────── */
-QSqlError DatabaseManager::initDb(QString &connectionName)
+QSqlError DatabaseManager::initDb(const QString &connectionName)
 {
     if (QSqlDatabase::contains(connectionName))
         QSqlDatabase::removeDatabase(connectionName);

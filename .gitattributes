@@ -1,0 +1,36 @@
+# Normalisation des fins de ligne — LF dans le dépôt, conversions auto par plateforme
+* text=auto eol=lf
+
+# Scripts shell : toujours LF (exécutables Linux)
+*.sh    text eol=lf
+*.bash  text eol=lf
+
+# Scripts Windows : CRLF
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Sources C++ / Qt
+*.cpp   text eol=lf
+*.h     text eol=lf
+*.ui    text eol=lf
+*.pro   text eol=lf
+*.pri   text eol=lf
+*.qrc   text eol=lf
+*.qss   text eol=lf
+
+# Données / config
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+
+# Binaires — pas de conversion
+*.png  binary
+*.jpg  binary
+*.ico  binary
+*.dll  binary
+*.exe  binary
+*.lib  binary
+*.a    binary

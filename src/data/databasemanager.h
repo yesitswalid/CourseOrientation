@@ -156,7 +156,7 @@ public:
 
     /* Initialisation et connexion à la base SQLite locale */
     QSqlError initDb();
-    QSqlError initDb(QString &connectionName);
+    QSqlError initDb(const QString &connectionName);
 
     /** @brief Initialise une base SQLite en mémoire (:memory:) pour les tests unitaires.
      *  N'écrit aucun fichier sur le disque. */

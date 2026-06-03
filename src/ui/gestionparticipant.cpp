@@ -107,7 +107,7 @@ void GestionParticipant::createTableView()
     model->setTable("participants");
 
     /* Récupérer uniquement les participants inscrits à la course en cours */
-    QSqlQuery q = m_db->getDb().exec();
+    QSqlQuery q(m_db->getDb());
     q.prepare("SELECT p.id FROM participants AS p "
               "JOIN participant_races AS pr ON p.id = pr.participant_id "
               "WHERE pr.race_id = ?");
@@ -256,7 +256,7 @@ void GestionParticipant::getCardId(QString cardId)
     ui.doigtButton->setEnabled(true);
 
     /* Afficher le nom du participant associé pour confirmation */
-    QSqlQuery q = m_db->getDb().exec();
+    QSqlQuery q(m_db->getDb());
     q.prepare("SELECT firstname, lastname FROM participants WHERE id=?");
     q.addBindValue(participantId);
     if (q.exec() && q.next()) {
@@ -297,7 +297,7 @@ void GestionParticipant::getResultDataParticipant(QString carteId, int pointsTot
     m_db->setPartipantPoints(participantId, pointsTotal);
     m_db->setPartipantBeacons(participantId, nbBalises);
 
-    QSqlQuery q = m_db->getDb().exec();
+    QSqlQuery q(m_db->getDb());
     q.prepare("SELECT firstname, lastname FROM participants WHERE id=?");
     q.addBindValue(participantId);
     if (q.exec() && q.next()) {
@@ -431,7 +431,7 @@ void GestionParticipant::on_razSimButton_clicked()
     m_db->setPortiqueBID(participantId, bidId);
 
     /* Confirmer le départ avec le numéro de dossard enregistré */
-    QSqlQuery q = m_db->getDb().exec();
+    QSqlQuery q(m_db->getDb());
     q.prepare("SELECT bid FROM participant_races WHERE participant_id=?");
     q.addBindValue(participantId);
     if (q.exec() && q.next())
@@ -464,7 +464,7 @@ void GestionParticipant::on_dataSimButton_clicked()
     }
 
     /* Récupérer le badge RFID enregistré pour ce participant */
-    QSqlQuery q = m_db->getDb().exec();
+    QSqlQuery q(m_db->getDb());
     q.prepare("SELECT finger FROM participant_races WHERE participant_id=?");
     q.addBindValue(participantId);
     if (!q.exec() || !q.next()) return;
@@ -506,7 +506,7 @@ void GestionParticipant::on_dataSimButton_clicked()
         const float  dureeMinutes = (arrivee - depart) / 60.0f;
 
         /* Afficher le résultat avec le numéro de dossard */
-        QSqlQuery qBid = m_db->getDb().exec();
+        QSqlQuery qBid(m_db->getDb());
         qBid.prepare("SELECT bid FROM participant_races WHERE participant_id=?");
         qBid.addBindValue(participantId);
         if (qBid.exec() && qBid.next()) {
