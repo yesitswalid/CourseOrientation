@@ -33,11 +33,11 @@ jobs:
           cache: true
           install-deps: true
 
-      - name: Configurer MSVC 2019
+      - name: Configurer MSVC 2022
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-          vsversion: '2019'
+          vsversion: '2022'
 
       - name: Compiler (Release)
         shell: cmd
