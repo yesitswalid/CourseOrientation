@@ -1,105 +1,117 @@
 {
     "1": {
-        "finger_id": 24021505178,
-        "passage_id": 26999,
-        "passage_start": 1654835437,
-        "passage_end": 1654838077,
+        "finger_id":  24021505178,
+        "bid_id":     "26999",
+        "bid_start":  1654835437,
+        "bid_end":    1654838077,
         "data": {
             "1": {
-                "longitude": 3884.455,
-                "latitude": 1884.455,
-                "order_id": 1,
-                "points": 2
+                "altitude":  "245",
+                "longitude": "3884.455",
+                "latitude":  "1884.455",
+                "order_id":  1,
+                "points":    2
             },
             "2": {
-                "longitude": 4884.455,
-                "latitude": 2884.455,
-                "order": 2,
-                "points": 3
+                "altitude":  "312",
+                "longitude": "4884.455",
+                "latitude":  "2884.455",
+                "order_id":  2,
+                "points":    3
             },
             "3": {
-                "longitude": 131.55,
-                "latitude": 182.455,
-                "order_id": 3,
-                "points": 5
+                "altitude":  "198",
+                "longitude": "131.55",
+                "latitude":  "182.455",
+                "order_id":  3,
+                "points":    5
             }
         }
     },
     "2": {
-        "finger_id": 23338344551,
-        "passage_id": 23415,
-        "passage_start": 1654835437,
-        "passage_end": 1654838917,
+        "finger_id":  23338344551,
+        "bid_id":     "23415",
+        "bid_start":  1654835437,
+        "bid_end":    1654838917,
         "data": {
             "1": {
-                "longitude": 3884.455,
-                "latitude": 1884.455,
-                "order_id": 1,
-                "points": 3
+                "altitude":  "245",
+                "longitude": "3884.455",
+                "latitude":  "1884.455",
+                "order_id":  1,
+                "points":    3
             },
             "2": {
-                "longitude": 4884.455,
-                "latitude": 2884.455,
-                "order_id": 2,
-                "points": 6
+                "altitude":  "312",
+                "longitude": "4884.455",
+                "latitude":  "2884.455",
+                "order_id":  2,
+                "points":    6
             },
             "3": {
-                "longitude": 131.55,
-                "latitude": 182.455,
-                "order_id": 3,
-                "points": 6
+                "altitude":  "198",
+                "longitude": "131.55",
+                "latitude":  "182.455",
+                "order_id":  3,
+                "points":    6
             }
         }
     },
     "3": {
-        "finger_id": 29451041105,
-        "passage_id": 17758,
-        "passage_start": 1654835437,
-        "passage_end": 1654839037,
+        "finger_id":  29451041105,
+        "bid_id":     "17758",
+        "bid_start":  1654835437,
+        "bid_end":    1654839037,
         "data": {
             "1": {
-                "longitude": 3884.455,
-                "latitude": 1884.455,
-                "order_id": 1,
-                "points": 3
+                "altitude":  "245",
+                "longitude": "3884.455",
+                "latitude":  "1884.455",
+                "order_id":  1,
+                "points":    3
             },
             "2": {
-                "longitude": 4884.455,
-                "latitude": 2884.455,
-                "order_id": 2,
-                "points": 4
+                "altitude":  "312",
+                "longitude": "4884.455",
+                "latitude":  "2884.455",
+                "order_id":  2,
+                "points":    4
             },
             "3": {
-                "longitude": 131.55,
-                "latitude": 182.455,
-                "order_id": 3,
-                "points": 4
+                "altitude":  "198",
+                "longitude": "131.55",
+                "latitude":  "182.455",
+                "order_id":  3,
+                "points":    4
             }
         }
     },
     "4": {
-        "finger_id": 29828364159,
-        "passage_id": 78155,
-        "passage_start": 1654835437,
-        "passage_end": 1654838017,
+        "finger_id":  29828364159,
+        "bid_id":     "78155",
+        "bid_start":  1654835437,
+        "bid_end":    1654838017,
         "data": {
             "1": {
-                "longitude": 3884.455,
-                "latitude": 1884.455,
-                "order_id": 1,
-                "points": 1
+                "altitude":  "245",
+                "longitude": "3884.455",
+                "latitude":  "1884.455",
+                "order_id":  1,
+                "points":    1
             },
             "2": {
-                "longitude": 4884.455,
-                "latitude": 2884.455,
-                "order_id": 2,
-                "points": 7
+                "altitude":  "312",
+                "longitude": "4884.455",
+                "latitude":  "2884.455",
+                "order_id":  2,
+                "points":    7
             },
             "3": {
-                "longitude": 131.55,
-                "latitude": 182.455,
-                "order_id": 3,
-                "points": 5
+                "altitude":  "198",
+                "longitude": "131.55",
+                "latitude":  "182.455",
+                "order_id":  3,
+                "points":    5
             }
         }
     }

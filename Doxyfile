@@ -1,0 +1,95 @@
+# ============================================================
+# Doxyfile — Documentation CourseOrientation
+# ============================================================
+# Générer : doxygen Doxyfile
+# Sortie  : docs/html/index.html
+# ============================================================
+
+#---------------------------------------------------------------------------
+# Informations du projet
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "CourseOrientation"
+PROJECT_BRIEF          = "Application de gestion de courses d'orientation"
+PROJECT_NUMBER         = "1.0.0"
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = NO
+
+#---------------------------------------------------------------------------
+# Sources à documenter
+#---------------------------------------------------------------------------
+INPUT                  = . src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.cpp
+EXCLUDE_PATTERNS       = */.git/* */tests/* *.moc.cpp moc_*.cpp ui_*.h qrc_*.cpp
+EXCLUDE_SYMLINKS       = NO
+
+#---------------------------------------------------------------------------
+# Extraction — tout documenter même sans commentaire Doxygen
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+#---------------------------------------------------------------------------
+# Langage et encodage
+#---------------------------------------------------------------------------
+DOXYFILE_ENCODING      = UTF-8
+OUTPUT_LANGUAGE        = French
+INPUT_ENCODING         = UTF-8
+
+#---------------------------------------------------------------------------
+# Sortie HTML
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_COLORSTYLE        = DARK
+HTML_DYNAMIC_SECTIONS  = YES
+GENERATE_TREEVIEW      = YES
+TREEVIEW_WIDTH         = 250
+SEARCHENGINE           = YES
+SEARCHDATA_FILE        = searchdata.xml
+
+#---------------------------------------------------------------------------
+# Désactiver LaTeX / RTF / Man (non nécessaires)
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+GENERATE_DOCBOOK       = NO
+
+#---------------------------------------------------------------------------
+# Graphes de dépendances (requiert Graphviz/dot)
+#---------------------------------------------------------------------------
+HAVE_DOT               = NO
+CLASS_DIAGRAMS         = YES
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+
+#---------------------------------------------------------------------------
+# Avertissements
+#---------------------------------------------------------------------------
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+WARN_LOGFILE           = docs/doxygen_warnings.log
+
+#---------------------------------------------------------------------------
+# Divers
+#---------------------------------------------------------------------------
+SORT_MEMBER_DOCS       = YES
+SORT_BRIEF_DOCS        = NO
+SHOW_USED_FILES        = YES
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = YES
+BRIEF_MEMBER_DESC      = YES
+REPEAT_BRIEF           = YES
+ALWAYS_DETAILED_SEC    = NO
+FULL_PATH_NAMES        = YES
+STRIP_FROM_PATH        = .

@@ -1,493 +1,158 @@
-# CourseOrientation 🏃‍♂️
+# CourseOrientation
 
-Une application **multi-plateforme** (Linux/Windows) développée avec **Qt 6** pour gérer les inscriptions et le suivi des courses d'orientation avec balises RFID.
+[![Build & Release](https://github.com/yesitswalid/CourseOrientation/actions/workflows/release.yml/badge.svg)](https://github.com/yesitswalid/CourseOrientation/actions/workflows/release.yml)
+[![Qt](https://img.shields.io/badge/Qt-6.x-41CD52?logo=qt&logoColor=white)](https://www.qt.io)
+[![C++](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=c%2B%2B&logoColor=white)](https://en.cppreference.com)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-informational)](https://github.com/yesitswalid/CourseOrientation/releases)
+[![License](https://img.shields.io/github/license/yesitswalid/CourseOrientation)](LICENSE)
 
-## 📋 Table des matières
-
-- [🎯 Vue d'ensemble](#-vue-densemble)
-- [✨ Fonctionnalités](#-fonctionnalités)
-- [🏗️ Architecture](#-architecture)
-- [📦 Installation](#-installation)
-- [💻 Utilisation](#-utilisation)
-- [📁 Structure du projet](#-structure-du-projet)
-- [🛠️ Technologies](#-technologies)
-- [⚙️ Configuration](#-configuration)
-- [🤝 Contribution](#-contribution)
-- [📞 Support](#-support)
+Application de gestion de **courses d'orientation** : inscription des participants, suivi en temps réel via RFID/UDP, synchronisation avec un serveur MySQL distant et export des résultats.
 
 ---
 
-## 🎯 Vue d'ensemble
+## Fonctionnalités
 
-**CourseOrientation** est une solution complète pour les clubs de course d'orientation permettant :
-- La **pré-inscription** en ligne des participants
-- L'**inscription sur site** sans connexion Internet
-- Le **suivi RFID** des passages aux points de contrôle
-- La **gestion locale** avec synchronisation web
-- L'**export de résultats** vers un serveur central
-
-### Contexte
-Remplace les anciennes perforatrices par des **lecteurs RFID** modernes. Les participants utilisent des badges RFID, passent par des portiques pour valider départ/arrivée, et les données sont synchronisées avec un serveur web pour les classements.
-
----
-
-## ✨ Fonctionnalités
-
-### 👥 Pour les Participants
-- 📝 **Pré-inscription** optionnelle à une course
-- 🆗 **Inscription le jour même** sans Internet
-- 🏷️ **Badge RFID** pour identifier le participant
-- 🏷️ **Passage au portique RFID** pour valider départ et arrivée
-- 📊 **Points de contrôle** enregistrés automatiquement
-
-### 🎯 Pour les Organisateurs
-- 🎯 **Gestion des courses** (création, sélection active)
-- 👥 **Gestion des participants** (CRUD complet)
-- 🔗 **Communication portiques RFID** via UDP
-- 💾 **Base de données SQLite locale** (offline)
-- ☁️ **Export/Import MySQL** vers serveur web
-- 📈 **Classements et statistiques**
-- ⚙️ **Configuration flexible** de la BD
+| Catégorie | Détail |
+|---|---|
+| **Participants** | Inscription, mise à jour, suppression, attribution de dossard |
+| **Courses** | Import depuis MySQL, sélection de la course active |
+| **Portique RFID** | Réception badge NFC via UDP (lecteur externe) |
+| **Port série** | Lecture dossard via RS-232 / USB-Serial |
+| **Synchronisation** | Import/export **asynchrone** vers MySQL (UI non bloquée) |
+| **Simulation** | Mode test avec données JSON intégrées |
+| **Sécurité** | Mot de passe obfusqué dans la config, hachage SHA-256 |
+| **Thème sombre** | Interface moderne via QSS (Catppuccin Mocha) |
+| **Logs** | Logger fichier thread-safe (niveaux Debug → Critical) |
 
 ---
 
-## 🏗️ Architecture
-
-### Diagramme d'architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    COUCHE PRÉSENTATION (UI)                 │
-│  ┌──────────────┬──────────────┬──────────────┐             │
-│  │  Inscription │ Gestion      │ Gestion      │             │
-│  │  Formulaire  │ Participants │ Portique     │             │
-│  └──────────────┴──────────────┴──────────────┘             │
-├─────────────────────────────────────────────────────────────┤
-│                 COUCHE MÉTIER (Business Logic)              │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  RaceManager (Singleton)                             │   │
-│  │  ├─ Courses sélectionnées                            │   │
-│  │  └─ État application                                │   │
-│  └──────────────────────────────────────────────────────┘   │
-├─────────────────────────────────────────────────────────────┤
-│                    COUCHE DONNÉES (Data Access)            │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  DatabaseManager (SQLite)                            │   │
-│  │  ├─ CRUD Participants                               │   │
-│  │  ├─ CRUD Courses                                     │   │
-│  │  └─ CRUD Checkpoints                                │   │
-│  └──────────────────────────────────────────────────────┘   │
-├─────────────────────────────────────────────────────────────┤
-│                      COUCHE RÉSEAU                         │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Server (Singleton UDP)    MySQLData                 │   │
-│  │  ├─ Portique RFID          ├─ Export/Import        │   │
-│  │  └─ Port 1234              └─ Sync MySQL            │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+src/
+├── ui/           Fenêtres Qt (application, participants, portique…)
+├── business/     RaceManager singleton + modèles de données
+├── data/         DatabaseManager (SQLite), MySQLData (async), SQLiteConverter
+├── network/      Serveur UDP + lecture port série portique
+├── config/       AppConfig (env vars + JSON), Configuration JSON
+├── core/         Constantes globales
+└── utilities/    Logger, Workers Qt (threading), CredentialsManager
+tests/            42 tests unitaires (Qt Test)
+styles/           Thème QSS
 ```
-
-### Composants Principaux
-
-#### 1. **Couche Présentation**
-| Composant | Rôle |
-|-----------|------|
-| `Application` | Fenêtre principale, orchestration |
-| `InscriptionForm` | Formulaire d'inscription participant |
-| `GestionParticipant` | Tableau & CRUD participants |
-| `GestionPortique` | Gestion portiques RFID |
-| `ConfigForm` | Configuration base de données |
-
-#### 2. **Couche Métier**
-| Composant | Rôle |
-|-----------|------|
-| `RaceManager` | Singleton - Gestion course active |
-| `Configuration` | Paramètres globaux |
-
-#### 3. **Couche Données**
-| Composant | Rôle |
-|-----------|------|
-| `DatabaseManager` | CRUD local SQLite |
-| `SQLiteConverter` | Export/Import JSON |
-| `MySQLData` | Communication serveur MySQL |
-
-#### 4. **Couche Réseau**
-| Composant | Rôle |
-|-----------|------|
-| `Server` | Singleton UDP - Portiques RFID |
 
 ---
 
-## 📦 Installation
+## Téléchargement
 
-### 🔧 Prérequis
+Dernière version sur la page [**Releases**](https://github.com/yesitswalid/CourseOrientation/releases) :
 
-**Système d'exploitation:**
-- Linux (Ubuntu 20.04+) ou Windows 10+
+| Plateforme | Fichier | Installation |
+|---|---|---|
+| Windows 10/11 x64 | `CourseOrientation-vX.Y.Z-windows-x64.zip` | Extraire → lancer `CourseOrientation.exe` |
+| Linux x86_64 | `CourseOrientation-vX.Y.Z-linux-x86_64.AppImage` | `chmod +x *.AppImage && ./CourseOrientation-*.AppImage` |
 
-**Qt Framework:**
-- Qt 6.x ou supérieur
+---
 
-**Plugins Qt requis:**
-```
-✅ QSQLite   - Base de données SQLite (inclus)
-✅ QMySQL    - Base de données MySQL
-✅ QNetwork  - Communication réseau
-✅ QSerialPort - Communication série
-```
+## Compilation depuis les sources
 
-### 📥 Installation pas à pas
+### Prérequis communs
 
-#### 1️⃣ Cloner le projet
-```bash
+- Qt 6.5+ avec les modules : `sql`, `network`, `serialport`, `concurrent`, `widgets`
+- MSVC 2022 (Windows) ou GCC 10+ (Linux)
+- MySQL client (optionnel) pour le driver `QMYSQL`
+
+### Windows
+
+```bat
+:: Ouvrir "x64 Native Tools Command Prompt for VS 2022"
 git clone https://github.com/yesitswalid/CourseOrientation.git
 cd CourseOrientation
+qmake CourseOrientation.pro CONFIG+=release
+nmake release
+:: Packager (windeployqt requis dans PATH)
+scripts\build-windows.bat
 ```
 
-#### 2️⃣ Installer Qt 6
+### Linux
 
-**Linux (Ubuntu):**
 ```bash
-sudo apt-get update
-sudo apt-get install qt6-base-dev qt6-tools-dev \
-  libqt6sql6 libqt6network6 libqt6serialport6
-```
+sudo apt-get install -y libgl1-mesa-dev libudev-dev libxkbcommon-dev libmysqlclient-dev
 
-**Windows/macOS:**
-- Télécharger depuis [qt.io](https://www.qt.io/download)
-- Sélectionner Qt 6.x lors de l'installation
-
-#### 3️⃣ Compiler le projet
-
-**Avec Qt Creator:**
-1. Ouvrir `CourseOrientation.pro`
-2. Sélectionner le kit Qt 6
-3. Appuyer sur `Ctrl+B` (Build)
-
-**En ligne de commande:**
-```bash
-mkdir build && cd build
-qmake ../CourseOrientation.pro
+git clone https://github.com/yesitswalid/CourseOrientation.git
+cd CourseOrientation
+qmake CourseOrientation.pro CONFIG+=release
 make -j$(nproc)
-./CourseOrientation
-```
-
-#### 4️⃣ Premier lancement
-
-- L'app crée automatiquement `course.db` dans le dossier d'exécution
-- Configurer MySQL via `Configuration → Base de données`
-- Importer les courses depuis le serveur web
-
----
-
-## 💻 Utilisation
-
-### Flux d'utilisation typique
-
-```
-┌─────────────────────────┐
-│   Démarrage Application │
-└───────────┬─────────────┘
-            │
-            ▼
-┌─────────────────────────┐
-│  Sélectionner une Course│
-└───────────┬─────────────┘
-            │
-     ┌──────┴──────┐
-     │             │
-     ▼             ▼
-┌──────────┐  ┌─────────────┐
-│Inscri-   │  │Gestion      │
-│ption     │  │Participants │
-└──────────┘  └─────────────┘
-     │             │
-     └──────┬──────┘
-            │
-            ▼
-┌─────────────────────────────┐
-│  Gestion Portique RFID      │
-│  ├─ Départ (validation)     │
-│  └─ Arrivée (enregistrement)│
-└───────────┬─────────────────┘
-            │
-     ┌──────┴──────┐
-     │             │
-     ▼             ▼
-┌──────────┐  ┌──────────┐
-│Exporter  │  │Importer  │
-│MySQL     │  │MySQL     │
-└──────────┘  └──────────┘
-```
-
-### Scénarios d'utilisation
-
-#### 📝 Ajouter un participant
-1. Sélectionner une course dans le menu principal
-2. Cliquer sur `Fichier → Inscription`
-3. Remplir le formulaire (nom, prénom, email, etc.)
-4. Valider → Enregistrement immédiat
-
-#### 🏷️ Valider un participant au portique
-1. Ouvrir `Fenêtre → Gestion Portique`
-2. Placer le badge RFID devant le lecteur
-3. L'app reçoit automatiquement l'ID via UDP
-4. Temps de passage enregistré en BD
-
-#### ☁️ Exporter les résultats
-1. Cliquer sur `Fichier → Exporter`
-2. Les données SQLite sont envoyées au serveur MySQL
-3. Message de confirmation
-
-#### 📥 Importer les courses
-1. Cliquer sur `Fichier → Importer`
-2. Récupère les courses depuis le serveur web
-3. Met à jour le combo box des courses
-
----
-
-## 📁 Structure du projet
-
-```
-CourseOrientation/
-│
-├── 📄 README.md                      # Documentation principale
-├── 📄 ARCHITECTURE.md                # Architecture technique
-├── 📄 LICENSE                        # Apache 2.0
-├── 📄 CourseOrientation.pro          # Configuration QMake
-├── 📄 simulation.json                # Données de simulation
-│
-├── 🔧 NOYAU
-├── main.cpp                          # Point d'entrée
-│
-├── 🎨 INTERFACE (UI)
-├── application.h/cpp                 # Fenêtre principale
-├── application.ui                    # Designer UI
-├── inscriptionform.h/cpp/ui          # Formulaire inscription
-├── gestionparticipant.h/cpp/ui       # Gestion participants
-├── gestionportique.h/cpp/ui          # Gestion portiques
-├── gestioncourse.h/cpp/ui            # Gestion courses
-├── configform.h/cpp/ui               # Configuration BD
-│
-├── 💾 ACCÈS AUX DONNÉES
-├── databasemanager.h/cpp             # Manager SQLite
-├── SQLiteConverter.h/cpp             # Convertisseur SQLite/JSON
-├── mysqldata.h/cpp                   # Interface MySQL
-│
-├── 🎯 MÉTIER
-├── racemanager.h/cpp                 # Singleton course active
-├── portique.h/cpp                    # Modèle portique
-├── race.h/cpp                        # Modèle course
-│
-├── 🌐 RÉSEAU
-├── server.h/cpp                      # Singleton UDP
-│
-├── ⚙️ CONFIGURATION
-├── configuration.h/cpp               # Paramètres
-├── config.json                       # Fichier config
-│
-└── 🎨 RESSOURCES
-    └── assets/                       # Images, icônes
+# Packager en AppImage
+bash scripts/build-linux.sh
 ```
 
 ---
 
-## 🛠️ Technologies
-
-| Technologie | Usage | Version |
-|-------------|-------|---------|
-| **Qt** | Framework GUI | 6.x |
-| **C++** | Langage principal | C++11 |
-| **SQLite** | Base locale | 3.x |
-| **MySQL** | Base serveur | 5.7+ |
-| **UDP** | Communication réseau | IPv4 |
-| **JSON** | Sérialisation données | Standard |
-| **QMake** | Build system | Qt |
-
-### Dépendances Qt
-```qmake
-QT += core gui sql widgets network serialport
-```
-
----
-
-## ⚙️ Configuration
-
-### Fichier `config.json`
-
-```json
-{
-  "ip": "192.168.1.100",
-  "port": 3306,
-  "user": "admin",
-  "mot_de_passe": "password",
-  "database": "coursorient",
-  "port_udp": 1234
-}
-```
-
-### Variables d'environnement
+## Tests unitaires
 
 ```bash
-# Base de données locale
-export DB_PATH="./course.db"
+cd tests
+qmake tests.pro && make
+./tst_courseorientation -v2
+```
 
-# Serveur MySQL
-export DB_HOST="192.168.1.100"
+| Suite | Tests | Couverture |
+|---|---|---|
+| TestConfiguration | 8 | Lecture/écriture JSON, persistance |
+| TestRaceManager | 10 | Machine à états DEFAULT/RAZ/DATA |
+| TestCredentialsManager | 10 | Hachage SHA-256, vérification |
+| TestAppConfig | 6 | Chargement JSON, variables d'environnement |
+| TestDatabase | 8 | CRUD participants/courses (SQLite `:memory:`) |
+
+---
+
+## Configuration
+
+### Connexion MySQL
+
+Menu **Paramètre → Configuration BDD** :
+
+| Champ | Valeur par défaut |
+|---|---|
+| IP | `127.0.0.1` |
+| Port | `3306` |
+| Utilisateur | `root` |
+| Mot de passe | obfusqué (XOR + Base64) dans `Configuration/config.json` |
+
+### Variables d'environnement (override)
+
+```bash
+export DB_HOST=192.168.1.100
 export DB_PORT=3306
-export DB_USER="admin"
-export DB_PASS="password"
-export DB_NAME="coursorient"
+export DB_USER=admin
+export DB_PASSWORD=secret
+export DB_NAME=coursorient
+export LOG_LEVEL=debug
 ```
 
-### Configuration Portique RFID
+### Port série (portique physique)
 
-| Paramètre | Valeur |
-|-----------|--------|
-| **Protocole** | UDP |
-| **Port** | 1234 |
-| **Adresse** | 127.0.0.1 |
-| **Format** | Hex (ID badge) |
+Par défaut : `/dev/ttyUSB0` (Linux) · `COM3` (Windows).
+Personnalisable :
 
----
-
-## 📊 Modèles de données
-
-### Tables SQLite
-
-```sql
--- Participants
-CREATE TABLE participants (
-  id INTEGER PRIMARY KEY,
-  lastname VARCHAR,
-  firstname VARCHAR,
-  mail VARCHAR UNIQUE,
-  password VARCHAR,
-  year VARCHAR,
-  genre_id INTEGER
-);
-
--- Courses
-CREATE TABLE races (
-  id INTEGER PRIMARY KEY,
-  id_department INTEGER,
-  name VARCHAR UNIQUE,
-  date DATETIME,
-  location VARCHAR,
-  gps_longitude VARCHAR,
-  gps_latitude VARCHAR,
-  difficulty INTEGER,
-  type INTEGER,
-  book INTEGER
-);
-
--- Relation Participant ↔ Course
-CREATE TABLE participant_races (
-  id INTEGER PRIMARY KEY,
-  participant_id INTEGER,
-  race_id INTEGER,
-  finger VARCHAR DEFAULT NULL,
-  bid VARCHAR DEFAULT NULL,
-  FOREIGN KEY(participant_id) REFERENCES participants(id),
-  FOREIGN KEY(race_id) REFERENCES races(id)
-);
-
--- Données de la course du participant
-CREATE TABLE participant_races_data (
-  race_id INTEGER,
-  participant_id INTEGER,
-  beacons INTEGER DEFAULT 0,
-  points INTEGER DEFAULT 0,
-  start DATETIME DEFAULT 0,
-  end DATETIME DEFAULT 0,
-  PRIMARY KEY(race_id, participant_id)
-);
-
--- Points de passage (checkpoints)
-CREATE TABLE checkpoints (
-  id INTEGER PRIMARY KEY,
-  altitude VARCHAR,
-  longitude VARCHAR,
-  attitude VARCHAR,
-  race_id INTEGER,
-  participant_id INTEGER,
-  order_id INTEGER,
-  points INTEGER,
-  FOREIGN KEY(race_id) REFERENCES races(id),
-  FOREIGN KEY(participant_id) REFERENCES participants(id)
-);
-
--- Genres
-CREATE TABLE genders (
-  id INTEGER PRIMARY KEY,
-  sexe VARCHAR UNIQUE
-);
+```
+qmake DEFINES+=SERIAL_PORT_DEFAULT=\\\"COM5\\\"
 ```
 
 ---
 
-## 🔌 API Réseau
+## Release automatique (GitHub Actions)
 
-### Communication Portique RFID
-
-**Format requête (Portique → Application):**
-```
-[ID_BADGE|TIMESTAMP|STATUS]
-Exemple: [001ABC5F|2024-01-15T10:30:45|DEPART]
+```bash
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
-**Format réponse (Application → Portique):**
-```
-[ACK|STATUS|MESSAGE]
-Exemple: [ACK|OK|Participant enregistré]
-```
-
-### Communication MySQL
-
-- **Protocol**: TCP/IP
-- **Port**: 3306 (par défaut)
-- **Authentification**: Username/Password
-- **Format**: SQL INSERT/UPDATE/SELECT
+GitHub Actions compile Windows + Linux et crée la Release avec les artefacts.
 
 ---
 
-## 🤝 Contribution
+## Licence
 
-Les contributions sont bienvenues ! Pour contribuer :
-
-### Processus
-
-1. **Fork** le projet
-2. **Créer une branche** (`git checkout -b feature/AmazingFeature`)
-3. **Commiter** les changements (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
-5. **Ouvrir une Pull Request**
-
-### Guidelines
-
-- ✅ Respecter le style C++11
-- ✅ Ajouter des tests unitaires
-- ✅ Mettre à jour la documentation
-- ✅ Commenter le code complexe
-
----
-
-## 📞 Support
-
-| Canal | Lien |
-|-------|------|
-| 📧 **Email** | [yesitswalid@gmail.com](mailto:yesitswalid@gmail.com) |
-| 🐛 **Issues** | [GitHub Issues](https://github.com/yesitswalid/CourseOrientation/issues) |
-| 💬 **Discussions** | [GitHub Discussions](https://github.com/yesitswalid/CourseOrientation/discussions) |
-
----
-
-## 📝 License
-
-Ce projet est distribué sous la licence **Apache 2.0** - voir [LICENSE](LICENSE) pour les détails.
-
----
-
-**Créé avec ❤️ pour les passionnés de course d'orientation**
-
-🏃‍♂️ **Keep running, keep tracking!**
+Voir [LICENSE](LICENSE).

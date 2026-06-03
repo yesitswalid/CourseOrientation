@@ -1,0 +1,211 @@
+name: Build & Release
+
+# Déclenchement : sur un tag vX.Y.Z ou manuellement
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (ex: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB 1 — Build Windows (MSVC x64)
+# ─────────────────────────────────────────────────────────────────────────────
+jobs:
+  build-windows:
+    name: Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer Qt 6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.*'
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          modules: qtserialport
+          cache: true
+
+      - name: Configurer MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Compiler (Release)
+        run: |
+          qmake CourseOrientation.pro CONFIG+=release
+          nmake release
+
+      - name: Packager avec windeployqt
+        shell: pwsh
+        run: |
+          $dist = "dist\CourseOrientation"
+          New-Item -ItemType Directory -Force $dist | Out-Null
+          Copy-Item "release\CourseOrientation.exe" "$dist\"
+          windeployqt `
+            --release `
+            --no-translations `
+            --no-system-d3d-compiler `
+            --no-opengl-sw `
+            "$dist\CourseOrientation.exe"
+
+      - name: Créer l'archive ZIP
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if (-not $tag) { $tag = "${{ inputs.version }}" }
+          Compress-Archive -Path "dist\CourseOrientation\*" `
+            -DestinationPath "CourseOrientation-${tag}-windows-x64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: CourseOrientation-*-windows-x64.zip
+          retention-days: 7
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB 2 — Build Linux (GCC x64, Ubuntu 22.04)
+# ─────────────────────────────────────────────────────────────────────────────
+  build-linux:
+    name: Linux x86_64
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer les dépendances système
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libgl1-mesa-dev libegl-dev libgles2-mesa-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev \
+            libxcb-cursor-dev libxcb-icccm4-dev libxcb-image0-dev \
+            libxcb-keysyms1-dev libxcb-randr0-dev libxcb-render-util0-dev \
+            libxcb-xinerama0-dev libxcb-xfixes0-dev libxcb-shape0-dev \
+            libudev-dev libmysqlclient-dev \
+            fuse libfuse2 wget imagemagick
+
+      - name: Installer Qt 6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.*'
+          host: linux
+          target: desktop
+          arch: linux_gcc_64
+          modules: qtserialport
+          cache: true
+
+      - name: Compiler (Release)
+        run: |
+          qmake CourseOrientation.pro CONFIG+=release
+          make -j$(nproc)
+
+      - name: Préparer l'AppDir
+        run: |
+          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          cp CourseOrientation AppDir/usr/bin/
+
+          # Fichier desktop
+          cat > AppDir/usr/share/applications/CourseOrientation.desktop << 'EOF'
+          [Desktop Entry]
+          Name=CourseOrientation
+          Comment=Gestion de courses d'orientation
+          Exec=CourseOrientation
+          Icon=CourseOrientation
+          Type=Application
+          Categories=Education;Sports;
+          EOF
+
+          # Icône
+          if [ -f assets/Orienteur.jpg ]; then
+            convert assets/Orienteur.jpg \
+              AppDir/usr/share/icons/hicolor/256x256/apps/CourseOrientation.png 2>/dev/null \
+              || cp assets/Orienteur.jpg \
+                   AppDir/usr/share/icons/hicolor/256x256/apps/CourseOrientation.png
+          else
+            # Icône vide si absente
+            convert -size 256x256 xc:#1e1e2e \
+              AppDir/usr/share/icons/hicolor/256x256/apps/CourseOrientation.png 2>/dev/null || true
+          fi
+
+      - name: Télécharger linuxdeployqt
+        run: |
+          wget -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+          chmod +x linuxdeployqt-continuous-x86_64.AppImage
+
+      - name: Créer l'AppImage
+        run: |
+          ARCH=x86_64 ./linuxdeployqt-continuous-x86_64.AppImage \
+            AppDir/usr/share/applications/CourseOrientation.desktop \
+            -qmake="$(which qmake)" \
+            -appimage \
+            -no-translations \
+            -unsupported-allow-new-glibc || true
+
+          # Nommer correctement l'AppImage produite
+          TAG="${{ github.ref_name }}"
+          [ -z "$TAG" ] && TAG="${{ inputs.version }}"
+          APPIMAGE=$(ls CourseOrientation*.AppImage 2>/dev/null | head -1)
+          if [ -n "$APPIMAGE" ]; then
+            mv "$APPIMAGE" "CourseOrientation-${TAG}-linux-x86_64.AppImage"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: CourseOrientation-*-linux-x86_64.AppImage
+          retention-days: 7
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB 3 — Créer la GitHub Release (uniquement sur tag)
+# ─────────────────────────────────────────────────────────────────────────────
+  create-release:
+    name: GitHub Release
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-release
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-release
+
+      - name: Publier la release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "CourseOrientation ${{ github.ref_name }}"
+          body: |
+            ## CourseOrientation ${{ github.ref_name }}
+
+            Application de gestion de courses d'orientation — Qt 6 / C++17.
+
+            ### Téléchargements
+
+            | Plateforme | Fichier | Prérequis |
+            |---|---|---|
+            | Windows 10/11 (x64) | `*.zip` → extraire et lancer `CourseOrientation.exe` | Aucun |
+            | Linux x86_64 | `*.AppImage` → `chmod +x` puis lancer | `libfuse2` |
+
+            ### Changelog
+          files: |
+            CourseOrientation-*-windows-x64.zip
+            CourseOrientation-*-linux-x86_64.AppImage
+          generate_release_notes: true
+          draft: false
+          prerelease: false

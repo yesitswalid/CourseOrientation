@@ -1,73 +1,105 @@
-# This file is used to ignore files which are generated
-# ----------------------------------------------------------------------------
+# ──────────────────────────────────────────────────────────────────────────────
+#  .gitignore — CourseOrientation (Qt 6 / C++17)
+# ──────────────────────────────────────────────────────────────────────────────
 
-*~
-*.autosave
-*.a
-*.core
-*.moc
-*.o
-*.obj
-*.orig
-*.rej
-*.so
-*.so.*
-*_pch.h.cpp
-*_resource.rc
-*.qm
-.#*
-*.*#
-core
-!core/
-tags
-.DS_Store
-.directory
-*.debug
-Makefile*
-*.prl
-*.app
+# ── Fichiers générés par qmake / cmake ────────────────────────────────────────
+Makefile
+Makefile.*
+.qmake.cache
+.qmake.stash
+*.pro.user
+*.pro.user.*
+
+# ── Fichiers générés par MOC, UIC, RCC ───────────────────────────────────────
 moc_*.cpp
+moc_*.h
 ui_*.h
 qrc_*.cpp
+*.moc
+
+# ── Fichiers objets et bibliothèques ──────────────────────────────────────────
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exp
+*.prl
+
+# ── Binaires ─────────────────────────────────────────────────────────────────
+*.exe
+*.app
+release/
+debug/
+Release/
+Debug/
+
+# ── Répertoires de build ──────────────────────────────────────────────────────
+build/
+build-*/
+Build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+_build/
+out/
+
+# ── Runtime — données générées par l'application ─────────────────────────────
+course.db
+course.db-shm
+course.db-wal
+Configuration/
+*.log
+app.log
+
+# ── Artifacts de release ──────────────────────────────────────────────────────
+dist/
+dist-*/
+AppDir/
+AppImage/
+*.AppImage
+*.zip
+*.tar.gz
+
+# ── Documentation générée ────────────────────────────────────────────────────
+docs/
+
+# ── Qt Creator ────────────────────────────────────────────────────────────────
+*.autosave
+*.shiboken
+.DS_Store
 Thumbs.db
-*.res
-*.rc
-/.qmake.cache
-/.qmake.stash
 
-# qtcreator generated files
-*.pro.user*
-
-# xemacs temporary files
-*.flc
-
-# Vim temporary files
+# ── Éditeurs ──────────────────────────────────────────────────────────────────
+*~
 .*.swp
+.*.swo
+*.orig
+*.bak
+*.rej
+.#*
+*.*#
 
-# Visual Studio generated files
-*.ib_pdb_index
-*.idb
-*.ilk
-*.pdb
+# ── IDE — Visual Studio ──────────────────────────────────────────────────────
+.vs/
 *.sln
 *.suo
-*.vcproj
-*vcproj.*.*.user
+*.vcxproj
+*.vcxproj.*
 *.ncb
 *.sdf
 *.opensdf
-*.vcxproj
-*vcxproj.*
+*.idb
+*.ilk
+*.pdb
 
-# MinGW generated files
-*.Debug
-*.Release
+# ── CI — artefacts temporaires ───────────────────────────────────────────────
+*.AppImage
+linuxdeployqt*.AppImage
 
-# Python byte code
+# ── Python ────────────────────────────────────────────────────────────────────
 *.pyc
-
-# Binaries
-# --------
-*.dll
-*.exe
-
+__pycache__/
